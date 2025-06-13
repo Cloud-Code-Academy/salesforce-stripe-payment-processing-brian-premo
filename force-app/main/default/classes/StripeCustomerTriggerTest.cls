@@ -1,0 +1,85 @@
+/**
+ * -----------------------------------------------------------------------------
+ * DESCRIPTION : Test class for StripeCustomerTrigger to validate customer creation and error handling.
+ *
+ * AUTHOR      : Brian Premo
+ * CREATED     : 2025-06-12
+ * LAST EDITED :
+ *
+ * VERSION     : 1.0.0
+ *
+ * CHANGE LOG  :
+ *  - 2025-06-12 v1.0.0 Initial creation
+ * -----------------------------------------------------------------------------
+ */
+@isTest
+private class StripeCustomerTriggerTest {
+  /* description: Test for successful insertion of a Stripe customer.
+   * This test verifies that a customer can be created successfully and the
+   * Stripe_Customer_ID__c field is populated correctly.
+   */
+  @isTest
+  static void insertCustomerSuccess() {
+    // Create Test Data
+    Stripe_Customer__c customer = StripeTestDataFactory.createStripeCustomer();
+
+    // Set Mock
+    StripeMockHttpResponse mockResponse = StripeMockHttpResponse.createSuccessCustomerResponse();
+    Test.setMock(HttpCalloutMock.class, mockResponse);
+
+    Test.startTest();
+    insert customer;
+    Test.stopTest();
+
+    // Retrieve the new customer
+    Stripe_Customer__c insertedCustomer = [
+      SELECT Id, Stripe_Customer_ID__c, Name
+      FROM Stripe_Customer__c
+      WHERE Id = :customer.Id
+      LIMIT 1
+    ];
+
+    // Assertions to verify customer was created successfully
+    Assert.areEqual(mockResponse.statusCode, 200, 'Status code should be 200');
+    Assert.areEqual(mockResponse.status, 'OK', 'Response status should be OK');
+    Assert.isNotNull(mockResponse.body, 'Response body should not be null');
+    Assert.isTrue(
+      mockResponse.body.contains('cus_123456'),
+      'Response body should contain the created customer ID'
+    );
+    Assert.isTrue(
+      insertedCustomer.Stripe_Customer_ID__c != null,
+      'Inserted customer should have a valid Stripe_Customer_ID__c'
+    );
+  }
+
+  /* description: Test for failure in inserting a Stripe customer due to invalid data.
+   * This test verifies that an error is thrown when trying to create a customer with invalid email.
+   */
+  @isTest
+  static void insertCustomerFailure() {
+    Boolean exceptionThrown = false;
+    // Create Test Data
+    Stripe_Customer__c customer = StripeTestDataFactory.createStripeCustomer();
+
+    // Set Mock
+    StripeMockHttpResponse mockResponse = StripeMockHttpResponse.createErrorCustomerResponse();
+    Test.setMock(HttpCalloutMock.class, mockResponse);
+
+    Test.startTest();
+    insert customer;
+    Test.stopTest();
+
+    // Assertions to verify error response
+    Assert.areEqual(mockResponse.statusCode, 400, 'Status code should be 400');
+    Assert.areEqual(
+      mockResponse.status,
+      'Bad Request',
+      'Response status should be Bad Request'
+    );
+    Assert.isTrue(
+      mockResponse.body.contains('error'),
+      'Response body should contain error message for invalid email'
+    );
+  }
+}

@@ -9,6 +9,7 @@
  *
  * CHANGE LOG  :
  *  - 2025-06-05 v1.0.0 Initial creation
+ *  - 2025-06-12 v1.0.1 Added logic to prevent recursion by bypassing triggers
  * -----------------------------------------------------------------------------
  */
 public with sharing class CreateStripeSubscriptionQueuable implements Queueable, Database.AllowsCallouts {
@@ -87,7 +88,11 @@ public with sharing class CreateStripeSubscriptionQueuable implements Queueable,
           stripeSubscription.items.data[0].current_period_end
         );
         subscription.Status__c = stripeSubscription.status;
+        subscription.Price_ID__c = stripeSubscription.items.data[0].price.id;
+
+        TriggerBypass.bypassStripeSubscription = true; // Bypass trigger to avoid recursion
         update subscription;
+        TriggerBypass.bypassStripeSubscription = false; // Reset bypass after update
       }
     } catch (Exception e) {
       Logger.error('Error creating Stripe Subscription: ' + e.getMessage());

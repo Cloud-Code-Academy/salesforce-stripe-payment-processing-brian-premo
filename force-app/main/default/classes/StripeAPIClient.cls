@@ -10,6 +10,7 @@
  *
  * CHANGE LOG  :
  *  - 2025-06-05 v1.0.0 Initial creation
+ *  - 2025-06-12 v1.0.1 Minor changes to improve descriptions of methods
  * -----------------------------------------------------------------------------
  */
 public with sharing class StripeAPIClient {
@@ -18,6 +19,7 @@ public with sharing class StripeAPIClient {
   /*
   description: Makes a callout to the Stripe API to create a customer.
   @return: StripeCustomerWrapper - A wrapper object containing the response from the Stripe API.
+  @param: customer: StripeCustomerWrapper.CustomerRequest - The customer request object containing the details of the customer to be created.
   */
   public static StripeCustomerWrapper createCustomer(
     StripeCustomerWrapper.CustomerRequest customer
@@ -75,6 +77,7 @@ public with sharing class StripeAPIClient {
   description: Makes a callout to the Stripe API to create a subscription. 
   Note that in order to create a subscription, you must first create a customer, price, and product in Stripe.
   @return: SubscriptionsWrapper - A wrapper object containing the response from the Subscription Endpoint .
+  @param: subscription: SubscriptionsWrapper - The subscription request object containing the details of the subscription to be created.
   */
   public static SubscriptionsWrapper createSubscription(
     SubscriptionsWrapper subscription
@@ -87,7 +90,7 @@ public with sharing class StripeAPIClient {
 
     // Log the HTTP callout details
     Logger.debug(
-      'HTTP Callout to Stripe API: ' +
+      'HTTP Callout to Stripe Subscriptions Endpoint: ' +
         req.getEndpoint() +
         ' HTTP Callout Method: ' +
         req.getMethod() +
@@ -189,6 +192,9 @@ public with sharing class StripeAPIClient {
   /*
   description: Makes a callout to the Stripe API to create a price for a product.
   @param productId: String - The ID of the product for which the price is being created.
+  @param amount: Decimal - The amount for the price, in the smallest currency unit (e.g., cents).
+  @param currencyCode: String - The currency code for the price (e.g., 'usd').
+  @param interval: String - The billing interval for the price (e.g., 'month', 'year').
   @return: String - The ID of the created price.
   */
   public static String createPrice(
@@ -258,10 +264,8 @@ public with sharing class StripeAPIClient {
 
   /*
   description: Updates an existing Stripe subscription.
-  @param stripeSubscriptionId: Id - The ID of the Stripe subscription to be updated
-  @param priceId: Id - The ID of the new price to be applied to the subscription.
-  @param prorationBehavior: String - The proration behavior to be applied during the update.
-  @return: String - The response body from the Stripe API after the update.
+  @param: subscription: SubscriptionsWrapper - The subscription object containing the details to be updated.
+  @return: SubscriptionsWrapper - A wrapper object containing the response from the Stripe API after the update.
   */
   //
   public static SubscriptionsWrapper updateSubscription(
@@ -322,6 +326,11 @@ public with sharing class StripeAPIClient {
     return wrapper;
   }
 
+  /*
+    description: Cancels a Stripe subscription.
+    @param subscriptionId: String - The ID of the subscription to be canceled.
+    @return: SubscriptionsWrapper - A wrapper object containing the response from the Stripe API after cancellation.
+  */
   public static SubscriptionsWrapper cancelSubscription(String subscriptionId) {
     HttpRequest req = new HttpRequest();
     req.setEndpoint('callout:Stripe_NC/subscriptions/' + subscriptionId);
@@ -378,6 +387,7 @@ public with sharing class StripeAPIClient {
     @return: String - The URL-encoded string representation of the customer request
     This method encodes the name, email, and phone fields to be used in a URL query string.
     Example output: "name=John%20Doe&email=john.doe%40example.com&phone=1234567890"
+    @param customerRequest : StripeCustomerWrapper.CustomerRequest - The customer request object containing the details of the customer to be created.
     */
   public static String toUrlEncodedString(
     StripeCustomerWrapper.CustomerRequest customerRequest

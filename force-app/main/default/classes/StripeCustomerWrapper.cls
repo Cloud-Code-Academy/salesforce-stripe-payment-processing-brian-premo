@@ -3,7 +3,7 @@
  * DESCRIPTION : Wrapper class for handling Stripe API responses.
  *
  * AUTHOR      : Brian Premo
- * CREATED     : 2025-05-05
+ * CREATED     : 2025-06-05
  *
  * VERSION     : 1.0.0
  *
