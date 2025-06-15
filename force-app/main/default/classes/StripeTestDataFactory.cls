@@ -10,6 +10,7 @@
  *
  * CHANGE LOG  :
  *  - 2025-06-12 v1.0.0 Initial creation
+ *  - 2025-06-12 v1.0.1 Added methods for creating subscription wrappers and customer requests
  * -----------------------------------------------------------------------------
  */
 @isTest
@@ -30,6 +31,7 @@ public with sharing class StripeTestDataFactory {
     subscription.Amount__c = 1000;
     subscription.Interval__c = 'month';
     subscription.Price_ID__c = 'price_123456';
+    subscription.Quantity__c = 1;
     return subscription;
   }
 
@@ -121,5 +123,32 @@ public with sharing class StripeTestDataFactory {
     customerRequest.phone = phone;
     customerRequest.name = name;
     return customerRequest;
+  }
+
+  public static CheckoutSessionWrapper createCheckoutSessionWrapper(
+    String customerId,
+    String priceId,
+    String currencyCode
+  ) {
+    CheckoutSessionWrapper sessionRequest = new CheckoutSessionWrapper();
+    sessionRequest.customer = customerId;
+    sessionRequest.mode = 'subscription';
+    sessionRequest.success_url = Redirect_URL__mdt.getInstance(
+        'Payment_Successful'
+      )
+      .Redirect_URL__c;
+    sessionRequest.cancel_url = Redirect_URL__mdt.getInstance(
+        'Payment_Cancelled'
+      )
+      .Redirect_URL__c;
+    sessionRequest.line_items = new List<CheckoutSessionWrapper.LineItem>();
+    sessionRequest.currency_code = currencyCode;
+
+    CheckoutSessionWrapper.LineItem lineItem = new CheckoutSessionWrapper.LineItem();
+    lineItem.price = priceId;
+    lineItem.quantity = 1;
+    sessionRequest.line_items.add(lineItem);
+
+    return sessionRequest;
   }
 }

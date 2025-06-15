@@ -10,6 +10,7 @@
  *
  * CHANGE LOG  :
  *  - 2025-06-12 v1.0.0 Initial creation
+ *  - 2025-06-14 v.1.0.1 Added tests for checkout session creation
  * -----------------------------------------------------------------------------
  */
 @isTest
@@ -266,6 +267,115 @@ private class StripeSubscriptionTriggerTest {
     Assert.isTrue(
       mockResponse.body.contains('error'),
       'Response body should contain error message for invalid cancellation'
+    );
+  }
+
+  @isTest
+  static void testCheckoutSessionCreationSuccess() {
+    // Create Test Data
+    Stripe_Customer__c customer = StripeTestDataFactory.createStripeCustomer();
+    customer.Stripe_Customer_ID__c = 'cus_12345'; // Set a valid Stripe customer ID
+    TriggerBypass.bypassStripeCustomer = true;
+    insert customer; // Ensure customer exists before creating subscription
+    TriggerBypass.bypassStripeCustomer = false;
+
+    Stripe_Subscription__c subscription = StripeTestDataFactory.createStripeSubscription();
+    subscription.Price_ID__c = null; //Ensure Price is initially null, this will be updated later which will fire the triiger
+    subscription.Stripe_Customer__c = customer.Id;
+    subscription.Quantity__c = 1; // Set a valid quantity for the subscription
+
+    TriggerBypass.bypassStripeSubscription = true; // Bypass insert trigger since we are simulating a checkout session creation
+    insert subscription;
+    TriggerBypass.bypassStripeSubscription = false;
+
+    //Update fields on subscription
+    subscription.Price_ID__c = 'price_12345'; // Set a valid price ID
+
+    // Set Mock for Checkout Session Creation
+    StripeMockHttpResponse mockResponse = StripeMockHttpResponse.createCheckoutSessionSuccessResponse();
+    Test.setMock(HttpCalloutMock.class, mockResponse);
+
+    Test.startTest();
+    update subscription;
+    Test.stopTest();
+
+    Stripe_Subscription__c updatedSubscription = [
+      SELECT Id, Stripe_Checkout__c, Checkout_URL__c, Sync_Status__c
+      FROM Stripe_Subscription__c
+      WHERE Id = :subscription.Id
+      LIMIT 1
+    ];
+
+    // Assertions to verify checkout session was created successfully
+    Assert.areEqual(mockResponse.statusCode, 200, 'Status code should be 200');
+    Assert.areEqual(mockResponse.status, 'OK', 'Response status should be OK');
+    Assert.isNotNull(mockResponse.body, 'Response body should not be null');
+    Assert.areEqual(
+      updatedSubscription.Stripe_Checkout__c,
+      'cs_test_123',
+      'Stripe_Checkout__c should match the mock response'
+    );
+    Assert.areEqual(
+      updatedSubscription.Sync_Status__c,
+      'Checkout Created',
+      'Sync_Status__c should be updated to Checkout Created'
+    );
+  }
+
+  @isTest
+  static void testCheckoutSessionCreationError() {
+    // Create Test Data
+    Stripe_Customer__c customer = StripeTestDataFactory.createStripeCustomer();
+    customer.Stripe_Customer_ID__c = 'cus_12345'; // Set a valid Stripe customer ID
+    TriggerBypass.bypassStripeCustomer = true;
+    insert customer; // Ensure customer exists before creating subscription
+    TriggerBypass.bypassStripeCustomer = false;
+    Stripe_Subscription__c subscription = StripeTestDataFactory.createStripeSubscription();
+    subscription.Price_ID__c = null; //Ensure Price is initially null, this will be updated later which will fire the triiger
+    subscription.Stripe_Customer__c = customer.Id;
+    subscription.Quantity__c = 1; // Set a valid quantity for the subscription
+    TriggerBypass.bypassStripeSubscription = true; // Bypass insert trigger since we are simulating a checkout session creation
+    insert subscription;
+    TriggerBypass.bypassStripeSubscription = false;
+    //Update fields on subscription
+    subscription.Price_ID__c = 'price_invalid'; // Set an invalid price ID to simulate error
+    Boolean exceptionThrown = false;
+    // Set Mock for Checkout Session Creation Error
+    StripeMockHttpResponse mockResponse = StripeMockHttpResponse.createCheckoutSessionErrorResponse();
+    Test.setMock(HttpCalloutMock.class, mockResponse);
+    try {
+      Test.startTest();
+      update subscription; // This should trigger the error
+      Test.stopTest();
+    } catch (Exception e) {
+      exceptionThrown = true;
+      System.debug('Expected exception caught: ' + e.getMessage());
+    }
+    // Assertions to verify error response
+    Assert.isTrue(
+      exceptionThrown,
+      'Exception should have been thrown for invalid price ID'
+    );
+    Assert.areEqual(mockResponse.statusCode, 404, 'Status code should be 400');
+    Assert.areEqual(
+      mockResponse.status,
+      'Bad Request',
+      'Response status should be Bad Request'
+    );
+    Assert.isTrue(
+      mockResponse.body.contains('error'),
+      'Response body should contain error message for invalid price ID'
+    );
+    Stripe_Subscription__c updatedSubscription = [
+      SELECT Id, Stripe_Checkout__c, Checkout_URL__c, Sync_Status__c
+      FROM Stripe_Subscription__c
+      WHERE Id = :subscription.Id
+      LIMIT 1
+    ];
+    // Ensure the subscription was not updated due to the error
+    Assert.isNull(
+      updatedSubscription.Stripe_Checkout__c,
+      'Stripe_Checkout__c should be null due to error'
     );
   }
 }
