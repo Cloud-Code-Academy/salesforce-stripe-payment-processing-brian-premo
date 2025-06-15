@@ -10,6 +10,7 @@
  *
  * CHANGE LOG  :
  *  - 2025-06-07 v1.0.0 Initial creation
+ *  - 2025-06-12 v1.0.1 Added support for creating checkout sessions
  * -----------------------------------------------------------------------------
  */
 public with sharing class StripeSubscriptionTriggerHandler {
@@ -27,8 +28,8 @@ public with sharing class StripeSubscriptionTriggerHandler {
           System.debug('Error creating Stripe customer: ' + e.getMessage());
         }
       }
-      update subscriptionsToUpdate;
     }
+    update subscriptionsToUpdate;
   }
 
   /*
@@ -62,6 +63,16 @@ public with sharing class StripeSubscriptionTriggerHandler {
       ) {
         System.enqueueJob(
           new UpdateStripeSubscriptionQueuable(subscription.Id, 'cancel')
+        );
+      }
+      //Handle Creating Checkout Session after Price Populated for First Time
+      if (
+        oldSubscription != null &&
+        oldSubscription.Price_ID__c == null &&
+        subscription.Price_ID__c != null
+      ) {
+        System.enqueueJob(
+          new CreateStripeCheckoutSessionQueuable(subscription.Id)
         );
       }
     }

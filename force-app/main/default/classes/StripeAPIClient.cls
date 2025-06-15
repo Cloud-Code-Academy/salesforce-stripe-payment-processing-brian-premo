@@ -383,6 +383,65 @@ public with sharing class StripeAPIClient {
   }
 
   /*
+    description: Creates a Stripe Checkout Session for a given checkout session wrapper.
+    @param checkoutSession: CheckoutSessionWrapper - The checkout session object containing the details for the session to be created.
+    @return: CheckoutSessionWrapper - A wrapper object containing the response from the Stripe API after creating the checkout session.
+  */
+  public static CheckoutSessionWrapper createCheckoutSession(
+    CheckoutSessionWrapper checkoutSession
+  ) {
+    HttpRequest req = new HttpRequest();
+    req.setEndpoint('callout:Stripe_NC/checkout/sessions');
+    req.setHeader('Content-Type', 'application/x-www-form-urlencoded');
+    req.setMethod('POST');
+    req.setBody(CheckoutSessionWrapper.toFormBody(checkoutSession));
+
+    // Log the HTTP callout details
+    Logger.debug(
+      'HTTP Callout to Stripe Checkout Session API: ' +
+        req.getEndpoint() +
+        ' HTTP Callout Method: ' +
+        req.getMethod() +
+        ' HTTP Callout Body: ' +
+        req.getBody()
+    );
+
+    Http http = new Http();
+    HttpResponse response = http.send(req);
+
+    if (response.getStatusCode() < 200 || response.getStatusCode() > 299) {
+      Logger.error(
+        'Error with HTTP Callout to Checkout Session Endpoint: ' +
+          response.getStatusCode() +
+          ' - ' +
+          response.getStatus() +
+          response.getBody()
+      );
+      Logger.saveLog();
+      throw new CalloutException(
+        'Error with HTTP Callout to Checkout Session Endpoint: ' +
+          response.getStatusCode() +
+          ' - ' +
+          response.getStatus() +
+          response.getBody()
+      );
+    }
+
+    Logger.debug(
+      'HTTP Callout successful to Checkout Session Endpoint: ' +
+        response.getStatusCode() +
+        ' HTTP Callout response to Checkout Session Endpoint: ' +
+        response.getBody()
+    );
+    Logger.saveLog();
+
+    CheckoutSessionWrapper wrapper = CheckoutSessionWrapper.parse(
+      response.getBody()
+    );
+    return wrapper;
+  }
+
+  /*
     description: Helper class that converts the customer request to a URL-encoded string
     @return: String - The URL-encoded string representation of the customer request
     This method encodes the name, email, and phone fields to be used in a URL query string.

@@ -224,4 +224,67 @@ public with sharing class StripeAPIClientTest {
       'Exception should have been thrown for HTTP 400 error'
     );
   }
+
+  // =============================Checkout Session Tests================================
+
+  /* description: Test for successful creation of a Stripe Checkout Session.
+   */
+  @isTest
+  static void createCheckoutSessionSuccess() {
+    //Create Test Data
+    CheckoutSessionWrapper sessionRequest = StripeTestDataFactory.createCheckoutSessionWrapper(
+      'cus_12345',
+      'price_12345',
+      'USD'
+    );
+
+    //Set Mock
+    StripeMockHttpResponse mockResponse = StripeMockHttpResponse.createCheckoutSessionSuccessResponse();
+    Test.setMock(HttpCalloutMock.class, mockResponse);
+
+    //Start Test
+    Test.startTest();
+    CheckoutSessionWrapper sessionResponse = StripeAPIClient.createCheckoutSession(
+      sessionRequest
+    );
+    Test.stopTest();
+
+    //Assertions to verify response
+    Assert.areEqual(mockResponse.statusCode, 200, 'Status code should be 200');
+    Assert.areEqual(mockResponse.status, 'OK', 'Response status should be OK');
+  }
+
+  /* description: Test for failure in creating a Stripe Checkout Session due to invalid data.
+   */
+  @isTest
+  static void createCheckoutSessionFailure() {
+    Boolean exceptionThrown = false;
+
+    //Create Test Data
+    CheckoutSessionWrapper sessionRequest = StripeTestDataFactory.createCheckoutSessionWrapper(
+      'cus_12345',
+      'price_invalid',
+      'USD'
+    );
+
+    //Set Mock
+    StripeMockHttpResponse mockResponse = StripeMockHttpResponse.createCheckoutSessionErrorResponse();
+    Test.setMock(HttpCalloutMock.class, mockResponse);
+
+    try {
+      Test.startTest();
+      StripeAPIClient.createCheckoutSession(sessionRequest);
+      Test.stopTest();
+    } catch (Exception e) {
+      exceptionThrown = true;
+      System.assert(
+        e.getMessage().contains('Error'),
+        'Exception message should indicate HTTP callout error'
+      );
+    }
+    System.assert(
+      exceptionThrown,
+      'Exception should have been thrown for HTTP 400 error'
+    );
+  }
 }

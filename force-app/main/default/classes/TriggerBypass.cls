@@ -9,8 +9,10 @@
  *
  * CHANGE LOG  :
  *  - 2025-06-12 v1.0.0 Initial creation
+ *  - 2025-06-12 v1.0.1 Added customer bypass flag
  * -----------------------------------------------------------------------------
  */
 public with sharing class TriggerBypass {
   public static Boolean bypassStripeSubscription = false;
+  public static Boolean bypassStripeCustomer = false;
 }

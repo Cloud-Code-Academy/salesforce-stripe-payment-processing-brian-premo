@@ -10,6 +10,7 @@
  *
  * CHANGE LOG  :
  *  - 2025-06-12 v1.0.0 Initial creation
+ *  - 2025-06-14 v1.0.1 Added more mock responses for various Stripe API endpoints
  * -----------------------------------------------------------------------------
  */
 @isTest
@@ -76,6 +77,15 @@ public class StripeMockHttpResponse implements HttpCalloutMock {
 
   public static StripeMockHttpResponse createErrorCancelSubscriptionResponse() {
     String body = '{"error":{"code":"subscription_not_found","doc_url":"https://stripe.com/docs/error-codes/subscription-not-found","message":"The subscription was not found.","param":"subscription","type":"invalid_request_error"}}';
+    return new StripeMockHttpResponse(404, 'Not Found', body);
+  }
+
+  public static StripeMockHttpResponse createCheckoutSessionSuccessResponse() {
+    String body = '{"id":"cs_test_123","object":"checkout.session","cancel_url":"https://resourceful-goat-lnfj4c-dev-ed.trailblaze.my.site.com/cancelled","collected_information":{"shipping_details":null},"consent":null,"consent_collection":null,"created":1749944920,"currency":"usd","currency_conversion":null,"customer":"cus_SUHdEVbHHF9LSn","customer_creation":null,"customer_details":{"address":null,"email":"customer@thisisacustomer.com"},"mode":"subscription","payment_method_configuration_details":{"id":"pmc_1RW1ARPuoWtmWWxELxGkOygg","parent":null},"payment_method_options":{"card":{"request_three_d_secure":"automatic"}},"payment_method_types":["card","link","cashapp","amazon_pay"],"subscription":null,"success_url":"https://resourceful-goat-lnfj4c-dev-ed.trailblaze.my.site.com/success","url":"https://checkout.stripe.com/c/pay/cs_test_a1Am3kRvzPqJ6HIK2iZ"}';
+    return new StripeMockHttpResponse(200, 'OK', body);
+  }
+  public static StripeMockHttpResponse createCheckoutSessionErrorResponse() {
+    String body = '{"error":{"code":"checkout_session_not_found","doc_url":"https://stripe.com/docs/error-codes/checkout-session-not-found","message":"The checkout session was not found.","param":"session","type":"invalid_request_error"}}';
     return new StripeMockHttpResponse(404, 'Not Found', body);
   }
 }
