@@ -10,6 +10,7 @@
  * CHANGE LOG  :
  *  - 2025-06-05 v1.0.0 Initial creation
  *  - 2025-06-12 v1.0.1 Added logic to prevent recursion by bypassing triggers
+ *  - 2026-06-20 v1.1.0 Refactor so that the queueable creates a Stripe Product and Price Object instead of *  Subscription
  * -----------------------------------------------------------------------------
  */
 public with sharing class CreateStripeSubscriptionQueuable implements Queueable, Database.AllowsCallouts {
@@ -58,6 +59,25 @@ public with sharing class CreateStripeSubscriptionQueuable implements Queueable,
       interval
     );
 
+    // Update the subscription record with the created Price ID
+    subscription.Price_ID__c = priceId;
+    subscription.Status__c = 'Incomplete';
+    subscription.Product_Id__c = productId;
+    System.debug('Stripe Subscription created with Price ID: ' + priceId);
+    try {
+      update subscription;
+    } catch (Exception e) {
+      Logger.error(
+        'Error updating Stripe Subscription: ' + e.getMessage(),
+        stripeSubscriptionId
+      );
+      Logger.saveLog();
+      throw new CalloutException(
+        'Error updating Stripe Subscription: ' + e.getMessage()
+      );
+    }
+
+    /*
     // Prepare Subscription Request
     SubscriptionsWrapper sw = new SubscriptionsWrapper();
     sw.customer = stripeCustomerId;
@@ -71,7 +91,7 @@ public with sharing class CreateStripeSubscriptionQueuable implements Queueable,
 
     iw.data.add(item);
     sw.items = iw;
-
+    
     //Call Stripe to Create Subscription
     try {
       SubscriptionsWrapper stripeSubscription = StripeAPIClient.createSubscription(
@@ -100,6 +120,6 @@ public with sharing class CreateStripeSubscriptionQueuable implements Queueable,
       throw new CalloutException(
         'Error creating Stripe Subscription: ' + e.getMessage()
       );
-    }
+    } */
   }
 }
