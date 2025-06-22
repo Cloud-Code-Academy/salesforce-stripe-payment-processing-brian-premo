@@ -20,7 +20,7 @@ public with sharing class StripeSubscriptionTriggerHandler {
     for (Stripe_Subscription__c subscription : newList) {
       if (TriggerBypass.bypassStripeSubscription == false) {
         try {
-          // Call the Stripe API to create the customer
+          // Call the Stripe API to create the price and product
           System.enqueueJob(
             new CreateStripeSubscriptionQueuable(subscription.Id)
           );
@@ -65,43 +65,40 @@ public with sharing class StripeSubscriptionTriggerHandler {
           );
           Logger.saveLog();
         }
-
-        //Handle Subscription Cancellation
-        if (
-          oldSubscription != null &&
-          oldSubscription.Status__c != subscription.Status__c &&
-          subscription.Status__c == 'canceled'
-        ) {
-          try {
-            System.enqueueJob(
-              new UpdateStripeSubscriptionQueuable(subscription.Id, 'cancel')
-            );
-          } catch (Exception e) {
-            Logger.error(
-              'Error canceling Stripe subscription for ' + subscription.Id,
-              e
-            );
-            Logger.saveLog();
-          }
+      }
+      //Handle Subscription Cancellation
+      else if (
+        oldSubscription != null &&
+        oldSubscription.Status__c != subscription.Status__c &&
+        subscription.Status__c == 'canceled'
+      ) {
+        try {
+          System.enqueueJob(
+            new UpdateStripeSubscriptionQueuable(subscription.Id, 'cancel')
+          );
+        } catch (Exception e) {
+          Logger.error(
+            'Error canceling Stripe subscription for ' + subscription.Id,
+            e
+          );
+          Logger.saveLog();
         }
-
-        //Handle Subscription Price Update for First Time
-        if (
-          oldSubscription.Price_ID__c == null &&
-          oldSubscription.Price_ID__c != subscription.Price_ID__c &&
-          subscription.Status__c == 'Incomplete'
-        ) {
-          try {
-            System.enqueueJob(
-              new CreateStripeCheckoutSessionQueuable(subscription.Id)
-            );
-          } catch (Exception e) {
-            Logger.error(
-              'Error updating Stripe subscription for ' + subscription.Id,
-              e
-            );
-            Logger.saveLog();
-          }
+      }
+      //Handle Subscription Price Update for First Time
+      else if (
+        oldSubscription.Price_ID__c == null &&
+        oldSubscription.Price_ID__c != subscription.Price_ID__c
+      ) {
+        try {
+          System.enqueueJob(
+            new CreateStripeCheckoutSessionQueuable(subscription.Id)
+          );
+        } catch (Exception e) {
+          Logger.error(
+            'Error updating Stripe subscription for ' + subscription.Id,
+            e
+          );
+          Logger.saveLog();
         }
       }
     }
