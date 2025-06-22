@@ -11,6 +11,8 @@
  * CHANGE LOG  :
  *  - 2025-06-05 v1.0.0 Initial creation
  *  - 2025-06-12 v1.0.1 Minor changes to improve descriptions of methods
+ *  - 2025-06-22 v1.1.0 removed logic for create sub, that will be done automatically
+ *  after checkout session is complete
  * -----------------------------------------------------------------------------
  */
 public with sharing class StripeAPIClient {
@@ -73,71 +75,6 @@ public with sharing class StripeAPIClient {
     return wrapper;
   }
 
-  /*
-  description: Makes a callout to the Stripe API to create a subscription. 
-  Note that in order to create a subscription, you must first create a customer, price, and product in Stripe.
-  @return: SubscriptionsWrapper - A wrapper object containing the response from the Subscription Endpoint .
-  @param: subscription: SubscriptionsWrapper - The subscription request object containing the details of the subscription to be created.
-  */
-  public static SubscriptionsWrapper createSubscription(
-    SubscriptionsWrapper subscription
-  ) {
-    HttpRequest req = new HttpRequest();
-    req.setEndpoint('callout:Stripe_NC/subscriptions');
-    req.setHeader('Content-Type', 'application/x-www-form-urlencoded');
-    req.setMethod('POST');
-    req.setBody(subscription.toFormCreateSubBody());
-
-    // Log the HTTP callout details
-    Logger.debug(
-      'HTTP Callout to Stripe Subscriptions Endpoint: ' +
-        req.getEndpoint() +
-        ' HTTP Callout Method: ' +
-        req.getMethod() +
-        ' HTTP Callout Body: ' +
-        req.getBody()
-    );
-
-    Http http = new Http();
-    HttpResponse response = http.send(req);
-
-    if (response.getStatusCode() < 200 || response.getStatusCode() > 299) {
-      Logger.error(
-        'Error with HTTP Callout: ' +
-          response.getStatusCode() +
-          ' - ' +
-          response.getStatus() +
-          response.getBody()
-      );
-      Logger.saveLog();
-      throw new CalloutException(
-        'Error with HTTP Callout: ' +
-          response.getStatusCode() +
-          ' - ' +
-          response.getStatus() +
-          response.getBody()
-      );
-    }
-
-    Logger.debug(
-      'HTTP Callout to Subscriptions Endpoint successful: ' +
-        response.getStatusCode() +
-        ' HTTP Callout to Subscriptions Endpoint response: ' +
-        response.getBody()
-    );
-    Logger.saveLog();
-
-    SubscriptionsWrapper wrapper = SubscriptionsWrapper.parse(
-      response.getBody()
-    );
-    return wrapper;
-  }
-
-  /*
-  description: Makes a callout to the Stripe API to create a product.
-  @param productName: String - The name of the product to be created.
-  @return: String - The ID of the created product.
-  */
   public static String createProduct(String productName) {
     HttpRequest req = new HttpRequest();
     req.setEndpoint('callout:Stripe_NC/products');
@@ -260,70 +197,6 @@ public with sharing class StripeAPIClient {
       response.getBody()
     );
     return (String) responseMap.get('id');
-  }
-
-  /*
-  description: Updates an existing Stripe subscription.
-  @param: subscription: SubscriptionsWrapper - The subscription object containing the details to be updated.
-  @return: SubscriptionsWrapper - A wrapper object containing the response from the Stripe API after the update.
-  */
-  //
-  public static SubscriptionsWrapper updateSubscription(
-    SubscriptionsWrapper subscription
-  ) {
-    HttpRequest req = new HttpRequest();
-    req.setEndpoint('callout:Stripe_NC/subscriptions/' + subscription.id);
-    req.setHeader('Content-Type', 'application/x-www-form-urlencoded');
-    req.setMethod('POST');
-
-    // Prepare the body for the update request. Include stripe subscription ID, new price ID, and proration behavior if provided.
-    String body = subscription.toFormUpdateSubBody();
-
-    req.setBody(body);
-
-    // Log the HTTP callout details
-    Logger.debug(
-      'HTTP Callout to Stripe API: ' +
-        req.getEndpoint() +
-        ' HTTP Callout Method: ' +
-        req.getMethod() +
-        ' HTTP Callout Body: ' +
-        req.getBody()
-    );
-
-    Http http = new Http();
-    HttpResponse response = http.send(req);
-
-    if (response.getStatusCode() < 200 || response.getStatusCode() > 299) {
-      Logger.error(
-        'Error with HTTP Callout: ' +
-          response.getStatusCode() +
-          ' - ' +
-          response.getStatus() +
-          response.getBody()
-      );
-      Logger.saveLog();
-      throw new CalloutException(
-        'Error with HTTP Callout: ' +
-          response.getStatusCode() +
-          ' - ' +
-          response.getStatus() +
-          response.getBody()
-      );
-    }
-    SubscriptionsWrapper wrapper = SubscriptionsWrapper.parse(
-      response.getBody()
-    );
-
-    Logger.debug(
-      'HTTP Callout successful: ' +
-        response.getStatusCode() +
-        ' HTTP Callout response: ' +
-        response.getBody()
-    );
-    Logger.saveLog();
-
-    return wrapper;
   }
 
   /*

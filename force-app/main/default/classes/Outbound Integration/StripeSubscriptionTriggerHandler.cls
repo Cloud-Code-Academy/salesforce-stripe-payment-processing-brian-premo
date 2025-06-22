@@ -44,36 +44,37 @@ public with sharing class StripeSubscriptionTriggerHandler {
     for (Stripe_Subscription__c subscription : newList) {
       Stripe_Subscription__c oldSubscription = oldMap.get(subscription.Id);
 
-      //Handle Price ID changes
+      //Handle Price Change
       if (
         oldSubscription != null &&
-        oldSubscription.Price_ID__c != subscription.Price_ID__c &&
-        TriggerBypass.bypassStripeSubscription == false
+        oldSubscription.Price_ID__c == subscription.Price_ID__c &&
+        oldSubscription.Amount__c != subscription.Amount__c
       ) {
-        System.enqueueJob(
-          new UpdateStripeSubscriptionQueuable(subscription.Id, 'update')
+        // Create a New Price in Stripe
+        StripeAPIClient.createPrice(
+          subscription.Product_ID__c,
+          (Integer) (subscription.Amount__c * 100), // Convert to cents
+          subscription.Currency__c,
+          subscription.Interval__c
         );
-      }
 
-      //Handle Subscription Cancellation
-      if (
-        oldSubscription != null &&
-        oldSubscription.Status__c != subscription.Status__c &&
-        subscription.Status__c == 'canceled'
-      ) {
-        System.enqueueJob(
-          new UpdateStripeSubscriptionQueuable(subscription.Id, 'cancel')
-        );
-      }
-      //Handle Creating Checkout Session after Price Populated for First Time
-      if (
-        oldSubscription != null &&
-        oldSubscription.Price_ID__c == null &&
-        subscription.Price_ID__c != null
-      ) {
-        System.enqueueJob(
-          new CreateStripeCheckoutSessionQueuable(subscription.Id)
-        );
+        //Enque a job to Create Stripe Checkout Session
+        if (TriggerBypass.bypassStripeSubscription == false) {
+          System.enqueueJob(
+            new CreateStripeCheckoutSessionQueuable(subscription.Id)
+          );
+        }
+
+        //Handle Subscription Cancellation
+        if (
+          oldSubscription != null &&
+          oldSubscription.Status__c != subscription.Status__c &&
+          subscription.Status__c == 'canceled'
+        ) {
+          System.enqueueJob(
+            new UpdateStripeSubscriptionQueuable(subscription.Id, 'cancel')
+          );
+        }
       }
     }
   }

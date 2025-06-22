@@ -9,6 +9,7 @@
  *
  * CHANGE LOG  :
  *  - 2025-06-05 v1.0.0 Initial creation
+ *  - 2025-06-12 v1.0.1 minor change to populate custom name field
  * -----------------------------------------------------------------------------
  */
 public with sharing class CreateStripeCustomerQueuable implements Queueable, Database.AllowsCallouts {
@@ -21,7 +22,7 @@ public with sharing class CreateStripeCustomerQueuable implements Queueable, Dat
   public void execute(QueueableContext context) {
     // Retrieve the Stripe_Customer__c record
     Stripe_Customer__c customer = [
-      SELECT Id, Name, Email__c, Phone__c
+      SELECT Id, Name, Email__c, Phone__c, Name__c
       FROM Stripe_Customer__c
       WHERE Id = :stripeCustomerId
       LIMIT 1
@@ -30,7 +31,7 @@ public with sharing class CreateStripeCustomerQueuable implements Queueable, Dat
     try {
       // Create a Stripe customer using the Stripe API client
       StripeCustomerWrapper.CustomerRequest customerRequest = new StripeCustomerWrapper.CustomerRequest();
-      customerRequest.name = customer.Name;
+      customerRequest.name = customer.Name__c;
       customerRequest.email = customer.Email__c;
       customerRequest.phone = customer.Phone__c;
 

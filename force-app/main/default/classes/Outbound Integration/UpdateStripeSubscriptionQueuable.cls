@@ -31,39 +31,51 @@ public with sharing class UpdateStripeSubscriptionQueuable implements Queueable,
         Status__c,
         Amount__c,
         Currency__c,
+        Quantity__c,
         Propration_Behavior__c,
         Price_ID__c,
         Subscription_ID__c,
         Current_Period_Start__c,
-        Current_Period_End__c
+        Current_Period_End__c,
+        Product_ID__c,
+        Interval__c
       FROM Stripe_Subscription__c
       WHERE Id = :stripeSubscriptionId
       LIMIT 1
     ];
 
-    //Handle Price ID changes
+    //If Quantity or Price change, create a new Price in Stripe and Generate a new Checkout Session
     if (operationType == 'update') {
-      //Prepare Subscription Request
-      SubscriptionsWrapper sw = new SubscriptionsWrapper();
-      sw.id = subscription.Subscription_ID__c;
-      sw.prorationBehavior = subscription.Propration_Behavior__c;
-
-      SubscriptionsWrapper.ItemWrapper iw = new SubscriptionsWrapper.ItemWrapper();
-      iw.data = new List<SubscriptionsWrapper.Item>();
-
-      SubscriptionsWrapper.Item item = new SubscriptionsWrapper.Item();
-      item.price = new SubscriptionsWrapper.Price();
-      item.price.id = subscription.Price_ID__c;
-
-      iw.data.add(item);
-      sw.items = iw;
-
       try {
-        SubscriptionsWrapper stripeSubscription = StripeAPIClient.updateSubscription(
-          sw
+        // Create a new Price in Stripe
+        String productId = subscription.Product_ID__c;
+        Integer amount = (Integer) (subscription.Amount__c * 100); // Convert to cents
+        String currencyCode = subscription.Currency__c;
+        String interval = subscription.Interval__c;
+
+        String newPriceId = StripeAPIClient.createPrice(
+          productId,
+          amount,
+          currencyCode,
+          interval
         );
-        // Update the Stripe_Subscription__c record with the new Status
-        subscription.Status__c = stripeSubscription.status;
+
+        // Update the Price_ID__c field in the subscription record
+        subscription.Price_ID__c = newPriceId;
+        update subscription;
+        System.debug(
+          'Stripe Subscription updated successfully: ' + subscription.Id
+        );
+        // Log the successful update
+        Logger.debug(
+          'Stripe Subscription updated successfully: ' + subscription.Id
+        );
+        Logger.saveLog();
+
+        // Enqueue a job to create a Stripe Checkout Session
+        System.enqueueJob(
+          new CreateStripeCheckoutSessionQueuable(subscription.Id)
+        );
       } catch (Exception e) {
         Logger.error(
           'Error updating Stripe subscription: ' + e.getMessage(),

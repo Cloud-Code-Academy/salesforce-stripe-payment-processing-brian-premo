@@ -20,10 +20,6 @@ public with sharing class CreateStripeCheckoutSessionQueuable implements Queueab
   }
 
   public void execute(QueueableContext context) {
-    // Your async processing logic here
-    // Example: retrieve a record and perform a callout
-    // MyObject__c obj = [SELECT Id, Name FROM MyObject__c WHERE Id = :recordId LIMIT 1];
-    // Callout logic or other processing
     Stripe_Subscription__c subscription = [
       SELECT
         Id,
