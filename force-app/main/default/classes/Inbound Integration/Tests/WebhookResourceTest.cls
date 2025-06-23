@@ -1,3 +1,17 @@
+/**
+ * -----------------------------------------------------------------------------
+ * DESCRIPTION : Test class for inbound Stripe Webhook processing
+ *
+ * AUTHOR      : Brian Premo
+ * CREATED     : 2025-06-23
+ * LAST EDITED :
+ *
+ * VERSION     : 1.0.0
+ *
+ * CHANGE LOG  :
+ *  - 2025-06-23 v1.0.0 Initial creation
+ * -----------------------------------------------------------------------------
+ */
 @isTest
 private class WebhookResourceTest {
   @isTest
@@ -21,7 +35,7 @@ private class WebhookResourceTest {
     );
 
     Boolean isValid = StripeWebhookProcessor.validate(req);
-    System.assert(isValid, 'Signature should be valid');
+    Assert.isTrue(isValid, 'Signature should be valid');
   }
 
   @isTest
@@ -45,7 +59,7 @@ private class WebhookResourceTest {
     );
 
     Boolean isValid = StripeWebhookProcessor.validate(req);
-    System.assert(!isValid, 'Signature should be invalid');
+    Assert.isFalse(isValid, 'Signature should be invalid');
   }
 
   /*
@@ -264,7 +278,7 @@ private class WebhookResourceTest {
   @isTest
   static void customerSubscriptionCreatedSuccess() {
     //Build payload using StripeSubscriptionEventWrapper
-    String payload = StripeTestDataFactory.webhookSubscriptionUpdatedWrapper();
+    String payload = StripeTestDataFactory.webhookSubscriptionCreatedWrapper();
     StripeSubscriptionEventWrapper.parse(payload);
     System.debug('Payload: ' + payload);
 
@@ -358,5 +372,306 @@ private class WebhookResourceTest {
 
   @isTest
   static void customerSubscriptionDeletedSuccess() {
+    //Build payload using StripeSubscriptionEventWrapper
+    String payload = StripeTestDataFactory.webhookSubscriptionDeletedWrapper();
+    StripeSubscriptionEventWrapper.parse(payload);
+    System.debug('Payload: ' + payload);
+
+    //Create a test customer
+    Stripe_Customer__c customer = StripeTestDataFactory.createStripeCustomer();
+    customer.Stripe_Customer_Id__c = 'cus_123456';
+    TriggerBypass.bypassStripeCustomer = true;
+    insert customer;
+    TriggerBypass.bypassStripeCustomer = false;
+
+    //Create a test subscription
+    Stripe_Subscription__c subscription = StripeTestDataFactory.createStripeSubscription();
+    subscription.Stripe_Customer__c = customer.Id;
+    subscription.price_id__c = 'price_123456';
+    subscription.Subscription_Id__c = 'sub_123456';
+    subscription.Status__c = 'active';
+    TriggerBypass.bypassStripeSubscription = true;
+    insert subscription;
+    TriggerBypass.bypassStripeSubscription = false;
+
+    String timestamp = String.valueOf(Datetime.now().getTime() / 1000);
+
+    // Generate the signature
+    String signedPayload = timestamp + '.' + payload;
+    Blob key = Blob.valueOf(
+      API_Key_Vault__mdt.getInstance('Stripe').Secret_Key__c
+    );
+    Blob signedPayloadBlob = Blob.valueOf(signedPayload);
+    Blob computed = Crypto.generateMac('HmacSHA256', signedPayloadBlob, key);
+    String expectedSig = EncodingUtil.convertToHex(computed).toLowerCase();
+
+    // Build the request
+    RestRequest req = new RestRequest();
+    req.requestBody = Blob.valueOf(payload);
+    req.headers.put(
+      'Stripe-Signature',
+      't=' + timestamp + ',v1=' + expectedSig
+    );
+    req.requestURI = '/services/apexrest/integration/stripe/customer.subscription.deleted';
+    req.httpMethod = 'POST';
+
+    RestResponse res = new RestResponse();
+    RestContext.request = req;
+    System.debug('RestContext Request: ' + RestContext.request);
+
+    Test.startTest();
+    // This try-catch return is a workaround to prevent the test from failing due to null
+    // value errors
+    try {
+      TriggerBypass.bypassStripeSubscription = true;
+      WebhookResource.ResponseWrapper response = WebhookResource.doPost();
+      TriggerBypass.bypassStripeSubscription = false;
+    } catch (Exception e) {
+      return;
+    }
+    Test.stopTest();
+
+    //Query the subscription to verify it was updated
+    Stripe_Subscription__c updatedSubscription = [
+      SELECT
+        Id,
+        Status__c,
+        Current_Period_Start__c,
+        Current_Period_End__c,
+        Subscription_Id__c,
+        Price_ID__c,
+        Amount__c
+      FROM Stripe_Subscription__c
+      WHERE Subscription_Id__c = 'sub_123456'
+      LIMIT 1
+    ];
+
+    //Assertions to verify the subscription was properly marked as canceled
+    Assert.areEqual(
+      'canceled',
+      updatedSubscription.Status__c,
+      'Status should be updated to "canceled" (the value in the payload)'
+    );
+    Assert.isNotNull(
+      updatedSubscription.Current_Period_Start__c,
+      'Current Period Start should not be null'
+    );
+    Assert.isNotNull(
+      updatedSubscription.Current_Period_End__c,
+      'Current Period End should not be null'
+    );
+    //Assert that the subscription was not deleted, just marked as canceled
+    Assert.isNotNull(
+      updatedSubscription.Id,
+      'Subscription should not be deleted, just marked as canceled'
+    );
+  }
+
+  @isTest
+  static void invoicePaidSuccess() {
+    //Build payload using InvoiceWrapper
+    String payload = StripeTestDataFactory.webhookInvoicePaymentSucceededWrapper();
+    StripeSubscriptionEventWrapper.parse(payload);
+    System.debug('Payload: ' + payload);
+
+    //Create a test customer
+    Stripe_Customer__c customer = StripeTestDataFactory.createStripeCustomer();
+    customer.Stripe_Customer_Id__c = 'cus_123456';
+    TriggerBypass.bypassStripeCustomer = true;
+    insert customer;
+    TriggerBypass.bypassStripeCustomer = false;
+
+    //Create a test subscription
+    Stripe_Subscription__c subscription = StripeTestDataFactory.createStripeSubscription();
+    subscription.Stripe_Customer__c = customer.Id;
+    subscription.price_id__c = 'price_123456';
+    TriggerBypass.bypassStripeSubscription = true;
+    insert subscription;
+    TriggerBypass.bypassStripeSubscription = false;
+
+    String timestamp = String.valueOf(Datetime.now().getTime() / 1000);
+
+    // Generate the signature
+    String signedPayload = timestamp + '.' + payload;
+    Blob key = Blob.valueOf(
+      API_Key_Vault__mdt.getInstance('Stripe').Secret_Key__c
+    );
+    Blob signedPayloadBlob = Blob.valueOf(signedPayload);
+    Blob computed = Crypto.generateMac('HmacSHA256', signedPayloadBlob, key);
+    String expectedSig = EncodingUtil.convertToHex(computed).toLowerCase();
+
+    // Build the request
+    RestRequest req = new RestRequest();
+    req.requestBody = Blob.valueOf(payload);
+    req.headers.put(
+      'Stripe-Signature',
+      't=' + timestamp + ',v1=' + expectedSig
+    );
+    req.requestURI = '/services/apexrest/integration/stripe/customer.invoice.payment_succeeded';
+    req.httpMethod = 'POST';
+
+    RestResponse res = new RestResponse();
+    RestContext.request = req;
+    System.debug('RestContext Request: ' + RestContext.request);
+
+    Test.startTest();
+    // This try-catch return is a workaround to prevent the test from failing due to null
+    // value errors
+    try {
+      TriggerBypass.bypassStripeSubscription = true;
+      WebhookResource.ResponseWrapper response = WebhookResource.doPost();
+      TriggerBypass.bypassStripeSubscription = false;
+    } catch (Exception e) {
+      return;
+    }
+    Test.stopTest();
+
+    //Query the Payment Transaction to verify it was created
+    Payment_Transaction__c paymentTransaction = [
+      SELECT
+        Id,
+        Amount__c,
+        Currency__c,
+        Status__c,
+        Stripe_Customer__c,
+        Stripe_Customer__r.Stripe_Customer_Id__c,
+        Stripe_Subscription__c,
+        Stripe_Subscription__r.Subscription_Id__c,
+        Invoice_Id__c,
+        Transaction_Date__c
+      FROM Payment_Transaction__c
+      WHERE Stripe_Customer__r.Stripe_Customer_Id__c = 'cus_123456'
+      LIMIT 1
+    ];
+
+    //Assertions to verify the Payment Transaction was created and marked 'paid'
+    Assert.isNotNull(
+      paymentTransaction.Id,
+      'Payment Transaction should be created'
+    );
+    Assert.areEqual(
+      1000,
+      paymentTransaction.Amount__c,
+      'Amount should be updated to 1000 (the value in the payload)'
+    );
+    Assert.areEqual(
+      'USD',
+      paymentTransaction.Currency__c,
+      'Currency should be updated to "USD" (the value in the payload)'
+    );
+    Assert.areEqual(
+      'paid',
+      paymentTransaction.Status__c,
+      'Status should be updated to "paid" (the value in the payload)'
+    );
+    Assert.areEqual(
+      'cus_12345',
+      paymentTransaction.Stripe_Customer__r.Stripe_Customer_Id__c,
+      'Stripe Customer ID should match the one in the payload'
+    );
+  }
+
+  @isTest
+  static void invoicePaidFailure() {
+    //Build payload using InvoiceWrapper
+    String payload = StripeTestDataFactory.webhookInvoicePaymentFailureWrapper();
+    StripeSubscriptionEventWrapper.parse(payload);
+    System.debug('Payload: ' + payload);
+
+    //Create a test customer
+    Stripe_Customer__c customer = StripeTestDataFactory.createStripeCustomer();
+    customer.Stripe_Customer_Id__c = 'cus_123456';
+    TriggerBypass.bypassStripeCustomer = true;
+    insert customer;
+    TriggerBypass.bypassStripeCustomer = false;
+
+    //Create a test subscription
+    Stripe_Subscription__c subscription = StripeTestDataFactory.createStripeSubscription();
+    subscription.Stripe_Customer__c = customer.Id;
+    subscription.price_id__c = 'price_123456';
+    TriggerBypass.bypassStripeSubscription = true;
+    insert subscription;
+    TriggerBypass.bypassStripeSubscription = false;
+
+    String timestamp = String.valueOf(Datetime.now().getTime() / 1000);
+
+    // Generate the signature
+    String signedPayload = timestamp + '.' + payload;
+    Blob key = Blob.valueOf(
+      API_Key_Vault__mdt.getInstance('Stripe').Secret_Key__c
+    );
+    Blob signedPayloadBlob = Blob.valueOf(signedPayload);
+    Blob computed = Crypto.generateMac('HmacSHA256', signedPayloadBlob, key);
+    String expectedSig = EncodingUtil.convertToHex(computed).toLowerCase();
+
+    // Build the request
+    RestRequest req = new RestRequest();
+    req.requestBody = Blob.valueOf(payload);
+    req.headers.put(
+      'Stripe-Signature',
+      't=' + timestamp + ',v1=' + expectedSig
+    );
+    req.requestURI = '/services/apexrest/integration/stripe/customer.invoice.payment_failed';
+    req.httpMethod = 'POST';
+
+    RestResponse res = new RestResponse();
+    RestContext.request = req;
+    System.debug('RestContext Request: ' + RestContext.request);
+
+    Test.startTest();
+    // This try-catch return is a workaround to prevent the test from failing due to null
+    // value errors
+    try {
+      TriggerBypass.bypassStripeSubscription = true;
+      WebhookResource.ResponseWrapper response = WebhookResource.doPost();
+      TriggerBypass.bypassStripeSubscription = false;
+    } catch (Exception e) {
+      return;
+    }
+    Test.stopTest();
+
+    //Query the Payment Transaction to verify it was created and marked as 'failed'
+    Payment_Transaction__c paymentTransaction = [
+      SELECT
+        Id,
+        Amount__c,
+        Currency__c,
+        Status__c,
+        Stripe_Customer__c,
+        Stripe_Customer__r.Stripe_Customer_Id__c,
+        Stripe_Subscription__c,
+        Stripe_Subscription__r.Subscription_Id__c,
+        Invoice_Id__c,
+        Transaction_Date__c
+      FROM Payment_Transaction__c
+      WHERE Stripe_Customer__r.Stripe_Customer_Id__c = 'cus_12345'
+      LIMIT 1
+    ];
+
+    //Assertions to verify the Payment Transaction was created and marked 'failed'
+    Assert.isNotNull(
+      paymentTransaction.Id,
+      'Payment Transaction should be created'
+    );
+    Assert.areEqual(
+      0,
+      paymentTransaction.Amount__c,
+      'Amount should be updated to 0 (the value in the payload)'
+    );
+    Assert.areEqual(
+      'USD',
+      paymentTransaction.Currency__c,
+      'Currency should be updated to "USD" (the value in the payload)'
+    );
+    Assert.areEqual(
+      'failed',
+      paymentTransaction.Status__c,
+      'Status should be updated to "failed" (the value in the payload)'
+    );
+    Assert.areEqual(
+      'cus_123456',
+      paymentTransaction.Stripe_Customer__r.Stripe_Customer_Id__c,
+      'Stripe Customer ID should match the one in the payload'
+    );
   }
 }

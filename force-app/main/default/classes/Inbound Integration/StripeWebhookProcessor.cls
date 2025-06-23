@@ -335,6 +335,7 @@ public without sharing class StripeWebhookProcessor implements IWebhookProcessor
     );
     Logger.saveLog();
     String invoiceId = invoiceWrapper.data.object_wrapper.id;
+    String invoicePdf = invoiceWrapper.data.object_wrapper.invoice_pdf;
     String subscriptionId = invoiceWrapper.data.object_wrapper.lines.data[0]
       .parent.subscription_item_details.subscription;
     String customerId = invoiceWrapper.data.object_wrapper.customer;
@@ -370,6 +371,7 @@ public without sharing class StripeWebhookProcessor implements IWebhookProcessor
     paymentTransaction.Amount__c = amount;
     paymentTransaction.Currency__c = currencyCode;
     paymentTransaction.Transaction_Date__c = transactionDateConverted;
+    paymentTransaction.Invoice_PDF__c = invoicePdf;
 
     try {
       insert paymentTransaction;
@@ -419,6 +421,7 @@ public without sharing class StripeWebhookProcessor implements IWebhookProcessor
       : null;
     String customerId = invoiceWrapper?.data?.object_wrapper?.customer;
     String status = 'Failed';
+    String invoicePdf = invoiceWrapper?.data?.object_wrapper?.invoice_pdf;
 
     Decimal amount = invoiceWrapper?.data?.object_wrapper?.amount_paid != null
       ? invoiceWrapper.data.object_wrapper.amount_paid / 100
@@ -478,6 +481,9 @@ public without sharing class StripeWebhookProcessor implements IWebhookProcessor
     }
     if (transactionDateConverted != null) {
       paymentTransaction.Transaction_Date__c = transactionDateConverted;
+    }
+    if (invoicePdf != null) {
+      paymentTransaction.Invoice_PDF__c = invoicePdf;
     }
 
     try {

@@ -90,57 +90,39 @@ public with sharing class StripeAPIClientTest {
       'Response body should contain error message for invalid email'
     );
   }
-  // =============================Subscription Tests===================================
-
-  /* description: Test for successful creation of a Stripe subscription.
-   */
+  // =============================Product Tests========================================
   @isTest
-  static void createSubscriptionSuccess() {
-    //Create test data
-    SubscriptionsWrapper createSubscriptionWrapper = StripeTestDataFactory.createSubscriptionWrapper(
-      'cus_12345',
-      'price_12345'
-    );
-
-    //Set mock
-    StripeMockHttpResponse mockResponse = StripeMockHttpResponse.createSuccessSubscriptionCreationResponse();
+  static void createProductSuccessResponse() {
+    String productName = 'Test Product';
+    StripeMockHttpResponse mockResponse = StripeMockHttpResponse.createProductSuccessResponse();
     Test.setMock(HttpCalloutMock.class, mockResponse);
 
     Test.startTest();
-    // Call the method to test
-    StripeAPIClient.createSubscription(createSubscriptionWrapper);
+    StripeAPIClient.createProduct(productName);
     Test.stopTest();
 
-    //Assertions to verify response
+    // Assertions to verify response
     Assert.areEqual(mockResponse.statusCode, 200, 'Status code should be 200');
     Assert.areEqual(mockResponse.status, 'OK', 'Response status should be OK');
     Assert.isNotNull(mockResponse.body, 'Response body should not be null');
     Assert.isTrue(
-      mockResponse.body.contains('sub_12345'),
-      'Response body should contain the subscription ID'
+      mockResponse.body.contains('prod_12345'),
+      'Response body should contain the product ID'
     );
   }
 
-  /* description: Test for failure in creating a Stripe subscription due to invalid price.
-   */
   @isTest
-  static void createSubscriptionFailure() {
+  static void createProductFailure() {
+    //Set a name that will cause a failure
+    String productName = '💣💣💣💣💣💣💣💣💣💣💣💣💣💣💣💣💣💣💣💣💣💣💣💣💣💣💣💣💣💣💣💣💣💣💣💣💣💣💣💣💣💣💣💣💣💣💣💣💣💣💣💣💣💣💣💣💣💣💣💣💣💣💣💣💣💣💣💣💣💣💣💣💣💣💣💣💣💣💣💣💣💣💣💣💣💣💣💣💣💣💣💣💣💣💣💣💣💣💣💣💣💣💣💣💣💣💣💣💣💣💣💣💣💣💣💣💣💣💣';
     Boolean exceptionThrown = false;
-
-    //Create test data
-    SubscriptionsWrapper createSubscriptionWrapper = StripeTestDataFactory.createSubscriptionWrapper(
-      'sub_12345',
-      'price_invalid'
-    );
-
-    //Set mock
-    StripeMockHttpResponse mockResponse = StripeMockHttpResponse.createErrorSubscriptionCreationResponse();
+    StripeMockHttpResponse mockResponse = StripeMockHttpResponse.createProductErrorResponse();
     Test.setMock(HttpCalloutMock.class, mockResponse);
     try {
       Test.startTest();
-      StripeAPIClient.createSubscription(createSubscriptionWrapper);
+      StripeAPIClient.createProduct(productName);
       Test.stopTest();
-    } catch (Exception e) {
+    } catch (CalloutException e) {
       exceptionThrown = true;
       System.assert(
         e.getMessage().contains('Error'),
@@ -151,77 +133,108 @@ public with sharing class StripeAPIClientTest {
         'Exception should have been thrown for HTTP 400 error'
       );
     }
+  }
 
-    //Assertions to verify error response
-    Assert.areEqual(mockResponse.statusCode, 400, 'Status code should be 400');
-    Assert.areEqual(
-      mockResponse.status,
-      'Bad Request',
-      'Response status should be Bad Request'
+  // =============================Price Tests===========================================
+
+  @isTest
+  static void createPriceSuccess() {
+    String productId = 'prod_12345';
+    Integer amount = 1000;
+    String currencyCode = 'USD';
+    String interval = 'month';
+
+    StripeMockHttpResponse mockResponse = StripeMockHttpResponse.createPriceSuccessResponse();
+    Test.setMock(HttpCalloutMock.class, mockResponse);
+    Test.startTest();
+    String priceId = StripeAPIClient.createPrice(
+      productId,
+      amount,
+      currencyCode,
+      interval
     );
+    Test.stopTest();
+
+    //Assertions to verify response
+    Assert.areEqual(mockResponse.statusCode, 200, 'Status code should be 200');
+    Assert.areEqual(mockResponse.status, 'OK', 'Response status should be OK');
+    Assert.isNotNull(mockResponse.body, 'Response body should not be null');
     Assert.isTrue(
-      mockResponse.body.contains('error'),
-      'Response body should contain error message for invalid price'
+      mockResponse.body.contains('price_12345'),
+      'Response body should contain the price ID'
+    );
+    Assert.areEqual(
+      priceId,
+      'price_12345',
+      'Returned price ID should match mock response'
     );
   }
 
-  /* description: Test for successful update of a Stripe subscription.
-   */
   @isTest
-  static void updateSubscriptionSuccess() {
-    //Create Test Data
-    SubscriptionsWrapper updateSubscriptionsWrapper = StripeTestDataFactory.updateSubscriptionWrapper(
-      'sub_12345',
-      'price_12345'
-    );
+  static void createPriceFailure() {
+    Boolean exceptionThrown = false;
+    String productId = 'prod_12345';
+    Integer amount = 1000;
+    String currencyCode = 'NotACurrency'; // Invalid currency code to simulate failure
+    String interval = 'month';
 
-    //Set Mock
-    StripeMockHttpResponse mockResponse = StripeMockHttpResponse.createSuccessSubscriptionUpdateResponse();
+    StripeMockHttpResponse mockResponse = StripeMockHttpResponse.createPriceErrorResponse();
+    Test.setMock(HttpCalloutMock.class, mockResponse);
+    try {
+      Test.startTest();
+      StripeAPIClient.createPrice(productId, amount, currencyCode, interval);
+      Test.stopTest();
+    } catch (CalloutException e) {
+      exceptionThrown = true;
+      System.Assert.isTrue(
+        e.getMessage().contains('Error'),
+        'Exception message should indicate HTTP callout error'
+      );
+      System.Assert.isTrue(
+        exceptionThrown,
+        'Exception should have been thrown for HTTP 400 error'
+      );
+      System.Assert.areEqual(
+        mockResponse.statusCode,
+        404,
+        'Status code should be 404'
+      );
+      System.Assert.areEqual(
+        mockResponse.status,
+        'Not Found',
+        'Response status should be Not Found for invalid currency'
+      );
+      System.Assert.isTrue(
+        mockResponse.body.contains('error'),
+        'Response body should contain error message for invalid currency'
+      );
+    }
+  }
+
+  @isTest
+  static void cancelSubscriptionSuccess() {
+    String subscriptionId = 'sub_12345';
+    String canceledAt = '1749501061';
+    StripeMockHttpResponse mockResponse = StripeMockHttpResponse.createCancelSubscriptionResponse();
+    SubscriptionsWrapper sw = SubscriptionsWrapper.parse(mockResponse.body);
+
+    //call to unix timestamp (testing for code coverage)
+    DateTime convertUnix = SubscriptionsWrapper.convertUnixToDatetime(
+      canceledAt
+    );
     Test.setMock(HttpCalloutMock.class, mockResponse);
 
     Test.startTest();
-    StripeAPIClient.updateSubscription(updateSubscriptionsWrapper);
+    StripeAPIClient.cancelSubscription(subscriptionId);
     Test.stopTest();
 
-    //Assertions to verify update was successful
+    //Assertions to verify response
     Assert.areEqual(mockResponse.statusCode, 200, 'Status code should be 200');
     Assert.areEqual(mockResponse.status, 'OK', 'Response status should be OK');
     Assert.isNotNull(mockResponse.body, 'Response body should not be null');
     Assert.isTrue(
       mockResponse.body.contains('sub_12345'),
-      'Response body should contain the updated subscription ID'
-    );
-  }
-
-  /* description: Test for failure in updating a Stripe subscription due to invalid data.
-   */
-  @isTest
-  static void updateSubscriptionFailure() {
-    Boolean exceptionThrown = false;
-    //Create Test Data
-    SubscriptionsWrapper updateSubscriptionsWrapper = StripeTestDataFactory.updateSubscriptionWrapper(
-      'sub_12345',
-      'price_12345'
-    );
-
-    //Set Mock
-    StripeMockHttpResponse mockResponse = StripeMockHttpResponse.createErrorSubscriptionUpdateResponse();
-    Test.setMock(HttpCalloutMock.class, mockResponse);
-
-    try {
-      Test.startTest();
-      StripeAPIClient.updateSubscription(updateSubscriptionsWrapper);
-      Test.stopTest();
-    } catch (Exception e) {
-      exceptionThrown = true;
-      System.assert(
-        e.getMessage().contains('Error'),
-        'Exception message should indicate HTTP callout error'
-      );
-    }
-    System.assert(
-      exceptionThrown,
-      'Exception should have been thrown for HTTP 400 error'
+      'Response body should contain the canceled subscription ID'
     );
   }
 

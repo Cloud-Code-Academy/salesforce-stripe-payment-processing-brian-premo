@@ -175,4 +175,98 @@ public with sharing class StripeTestDataFactory {
     String payload = JSON.serialize(subscriptionEvent);
     return payload;
   }
+
+  public static String webhookSubscriptionCreatedWrapper() {
+    StripeSubscriptionEventWrapper subscriptionEvent = new StripeSubscriptionEventWrapper();
+    subscriptionEvent.id = 'sub_123456';
+    subscriptionEvent.data = new StripeSubscriptionEventWrapper.DataWrapper();
+    subscriptionEvent.data.object_wrapper = new StripeSubscriptionEventWrapper.ObjectWrapper();
+    subscriptionEvent.data.object_wrapper.id = 'sub_123456';
+    subscriptionEvent.data.object_wrapper.status = 'active';
+    subscriptionEvent.data.object_wrapper.default_payment_method = 'pm_123456';
+    subscriptionEvent.data.object_wrapper.items = new StripeSubscriptionEventWrapper.ItemsWrapper();
+    subscriptionEvent.data.object_wrapper.items.data = new List<StripeSubscriptionEventWrapper.SubscriptionItem>();
+    StripeSubscriptionEventWrapper.SubscriptionItem item = new StripeSubscriptionEventWrapper.SubscriptionItem();
+    item.quantity = 1;
+    item.current_period_start = System.now().getTime() / 1000;
+    item.current_period_end = System.now().getTime() / 1000 + 2592000; // 30 days later
+    item.price = new StripeSubscriptionEventWrapper.PriceWrapper();
+    item.price.id = 'price_123456';
+    item.price.object_type = 'price';
+    item.price.unit_amount = 1000; // $10.00
+    subscriptionEvent.data.object_wrapper.items.data.add(item);
+    subscriptionEvent.type = 'customer.subscription.created';
+    String payload = JSON.serialize(subscriptionEvent);
+    return payload;
+  }
+
+  public static String webhookSubscriptionDeletedWrapper() {
+    StripeSubscriptionEventWrapper subscriptionEvent = new StripeSubscriptionEventWrapper();
+    subscriptionEvent.id = 'sub_123456';
+    subscriptionEvent.data = new StripeSubscriptionEventWrapper.DataWrapper();
+    subscriptionEvent.data.object_wrapper = new StripeSubscriptionEventWrapper.ObjectWrapper();
+    subscriptionEvent.data.object_wrapper.id = 'sub_123456';
+    subscriptionEvent.data.object_wrapper.status = 'canceled';
+    subscriptionEvent.data.object_wrapper.items = new StripeSubscriptionEventWrapper.ItemsWrapper();
+    subscriptionEvent.data.object_wrapper.items.data = new List<StripeSubscriptionEventWrapper.SubscriptionItem>();
+    StripeSubscriptionEventWrapper.SubscriptionItem item = new StripeSubscriptionEventWrapper.SubscriptionItem();
+    item.quantity = 1;
+    item.current_period_start = System.now().getTime() / 1000;
+    item.current_period_end = System.now().getTime() / 1000 + 2592000; // 30 days later
+    item.price = new StripeSubscriptionEventWrapper.PriceWrapper();
+    subscriptionEvent.data.object_wrapper.items.data.add(item);
+    subscriptionEvent.type = 'customer.subscription.deleted';
+    String payload = JSON.serialize(subscriptionEvent);
+    return payload;
+  }
+
+  public static String webhookInvoicePaymentSucceededWrapper() {
+    StripeInvoiceWrapper invoiceWrapper = new StripeInvoiceWrapper();
+    invoiceWrapper.id = 'in_12345';
+    invoiceWrapper.type = 'invoice.payment_succeeded';
+    invoiceWrapper.data = new StripeInvoiceWrapper.DataWrapper();
+    invoiceWrapper.data.object_wrapper = new StripeInvoiceWrapper.ObjectWrapper();
+    invoiceWrapper.data.object_wrapper.id = 'in_12345';
+    invoiceWrapper.data.object_wrapper.customer = 'cus_12345';
+    invoiceWrapper.data.object_wrapper.invoice_pdf = 'https://example.com/invoice.pdf';
+    invoiceWrapper.data.object_wrapper.created = '1750711342';
+    invoiceWrapper.data.object_wrapper.currency_code = 'usd';
+    invoiceWrapper.data.object_wrapper.amount_paid = 1000;
+    invoiceWrapper.data.object_wrapper.status = 'paid';
+    invoiceWrapper.data.object_wrapper.lines = new StripeInvoiceWrapper.LineItem();
+    invoiceWrapper.data.object_wrapper.lines.data = new List<StripeInvoiceWrapper.LineItemData>();
+    StripeInvoiceWrapper.LineItemData lineItem = new StripeInvoiceWrapper.LineItemData();
+    lineItem.amount = 1000;
+    lineItem.parent = new StripeInvoiceWrapper.ParentWrapper();
+    lineItem.parent.subscription_item_details = new StripeInvoiceWrapper.SubscriptionItemDetailsWrapper();
+    lineItem.parent.subscription_item_details.subscription = 'sub_12345';
+    invoiceWrapper.data.object_wrapper.lines.data.add(lineItem);
+    String payload = JSON.serialize(invoiceWrapper);
+    return payload;
+  }
+
+  public static String webhookInvoicePaymentFailureWrapper() {
+    StripeInvoiceWrapper invoiceWrapper = new StripeInvoiceWrapper();
+    invoiceWrapper.id = 'in_12345';
+    invoiceWrapper.data = new StripeInvoiceWrapper.DataWrapper();
+    invoiceWrapper.type = 'invoice.payment_failed';
+    invoiceWrapper.data.object_wrapper = new StripeInvoiceWrapper.ObjectWrapper();
+    invoiceWrapper.data.object_wrapper.id = 'in_12345';
+    invoiceWrapper.data.object_wrapper.customer = 'cus_12345';
+    invoiceWrapper.data.object_wrapper.invoice_pdf = 'https://example.com/invoice.pdf';
+    invoiceWrapper.data.object_wrapper.created = '1750711342';
+    invoiceWrapper.data.object_wrapper.currency_code = 'usd';
+    invoiceWrapper.data.object_wrapper.amount_paid = 1000;
+    invoiceWrapper.data.object_wrapper.status = 'failed';
+    invoiceWrapper.data.object_wrapper.lines = new StripeInvoiceWrapper.LineItem();
+    invoiceWrapper.data.object_wrapper.lines.data = new List<StripeInvoiceWrapper.LineItemData>();
+    StripeInvoiceWrapper.LineItemData lineItem = new StripeInvoiceWrapper.LineItemData();
+    lineItem.amount = 0;
+    lineItem.parent = new StripeInvoiceWrapper.ParentWrapper();
+    lineItem.parent.subscription_item_details = new StripeInvoiceWrapper.SubscriptionItemDetailsWrapper();
+    lineItem.parent.subscription_item_details.subscription = 'sub_12345';
+    invoiceWrapper.data.object_wrapper.lines.data.add(lineItem);
+    String payload = JSON.serialize(invoiceWrapper);
+    return payload;
+  }
 }

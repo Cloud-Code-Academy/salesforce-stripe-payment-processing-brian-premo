@@ -4,6 +4,7 @@ public class SubscriptionsWrapper {
   public ItemWrapper items;
   public String prorationBehavior;
   public String status;
+  public String canceled_at;
 
   public class ItemWrapper {
     public String objectType;
@@ -18,45 +19,6 @@ public class SubscriptionsWrapper {
 
   public class Price {
     public String id;
-  }
-
-  /* description: Converts the SubscriptionsWrapper object to a URL-encoded string for use in an HTTP request body.
-   * @return: String - The URL-encoded string representation of the SubscriptionsWrapper object.
-   *
-   */
-  public String toFormCreateSubBody() {
-    List<String> parts = new List<String>();
-    parts.add('payment_behavior=default_incomplete');
-    parts.add('customer=' + EncodingUtil.urlEncode(customer, 'UTF-8'));
-    for (Integer i = 0; i < items.data.size(); i++) {
-      parts.add(
-        'items[' +
-          i +
-          '][price]=' +
-          EncodingUtil.urlEncode(items.data[i].price.id, 'UTF-8')
-      );
-    }
-    Logger.debug('Form body parts: ' + parts);
-    Logger.saveLog();
-    return String.join(parts, '&');
-  }
-
-  public String toFormUpdateSubBody() {
-    List<String> parts = new List<String>();
-    parts.add(
-      'proration_behavior=' + EncodingUtil.urlEncode(prorationBehavior, 'UTF-8')
-    );
-    for (Integer i = 0; i < items.data.size(); i++) {
-      parts.add(
-        'items[' +
-          i +
-          '][price]=' +
-          EncodingUtil.urlEncode(items.data[i].price.id, 'UTF-8')
-      );
-    }
-    Logger.debug('Form body parts: ' + parts);
-    Logger.saveLog();
-    return String.join(parts, '&');
   }
 
   /* description: Parses the JSON response from the Stripe API and returns a SubscriptionsWrapper object.
