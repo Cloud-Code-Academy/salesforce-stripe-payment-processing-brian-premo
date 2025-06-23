@@ -29,6 +29,7 @@ global without sharing class WebhookResource {
     System.debug('Processing webhook for path: ' + path);
     try {
       WebhookFactory.processWebhook(path, req);
+      System.debug('Webhook processed successfully for path: ' + path);
       res.statusCode = 200;
       return new ResponseWrapper('success', 'Webhook processed successfully');
     } catch (Exception e) {

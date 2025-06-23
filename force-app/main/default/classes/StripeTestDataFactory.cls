@@ -151,4 +151,28 @@ public with sharing class StripeTestDataFactory {
     String body = '{"id":"evt_1RcsyrPuoWtmWWxEfvywRV38","object":"event","api_version":"2025-05-28.basil","created":1750618265,"data":{"object":{"id":"cus_123456","object":"customer","address":null,"balance":0,"created":1750618261,"currency":"usd","default_source":null,"delinquent":false,"description":"(created by Stripe CLI)","discount":null,"email":"testemail@test.com","invoice_prefix":"GLA5RA6I","invoice_settings":{"custom_fields":null,"default_payment_method":"pm_123456","footer":null,"rendering_options":null},"livemode":false,"metadata":{},"name":"Test Customer Name","next_invoice_sequence":2,"phone":"1231231234","preferred_locales":[],"shipping":null,"tax_exempt":"none","test_clock":null},"previous_attributes":{"next_invoice_sequence":1}},"livemode":false,"pending_webhooks":1,"request":{"id":"req_6OOL3P0bNLI5B7","idempotency_key":"c710aeeb-a254-4ab7-bf4e-5d8140389dae"},"type":"customer.updated"}';
     return body;
   }
+
+  public static String webhookSubscriptionUpdatedWrapper() {
+    StripeSubscriptionEventWrapper subscriptionEvent = new StripeSubscriptionEventWrapper();
+    subscriptionEvent.id = 'sub_123456';
+    subscriptionEvent.data = new StripeSubscriptionEventWrapper.DataWrapper();
+    subscriptionEvent.data.object_wrapper = new StripeSubscriptionEventWrapper.ObjectWrapper();
+    subscriptionEvent.data.object_wrapper.id = 'sub_123456';
+    subscriptionEvent.data.object_wrapper.status = 'active';
+    subscriptionEvent.data.object_wrapper.default_payment_method = 'pm_123456';
+    subscriptionEvent.data.object_wrapper.items = new StripeSubscriptionEventWrapper.ItemsWrapper();
+    subscriptionEvent.data.object_wrapper.items.data = new List<StripeSubscriptionEventWrapper.SubscriptionItem>();
+    StripeSubscriptionEventWrapper.SubscriptionItem item = new StripeSubscriptionEventWrapper.SubscriptionItem();
+    item.quantity = 1;
+    item.current_period_start = System.now().getTime() / 1000;
+    item.current_period_end = System.now().getTime() / 1000 + 2592000; // 30 days later
+    item.price = new StripeSubscriptionEventWrapper.PriceWrapper();
+    item.price.id = 'price_123456';
+    item.price.object_type = 'price';
+    item.price.unit_amount = 1000; // $10.00
+    subscriptionEvent.data.object_wrapper.items.data.add(item);
+    subscriptionEvent.type = 'customer.subscription.updated';
+    String payload = JSON.serialize(subscriptionEvent);
+    return payload;
+  }
 }

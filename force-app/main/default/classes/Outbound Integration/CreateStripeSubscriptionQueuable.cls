@@ -76,50 +76,5 @@ public with sharing class CreateStripeSubscriptionQueuable implements Queueable,
         'Error updating Stripe Subscription: ' + e.getMessage()
       );
     }
-
-    /*
-    // Prepare Subscription Request
-    SubscriptionsWrapper sw = new SubscriptionsWrapper();
-    sw.customer = stripeCustomerId;
-
-    SubscriptionsWrapper.ItemWrapper iw = new SubscriptionsWrapper.ItemWrapper();
-    iw.data = new List<SubscriptionsWrapper.Item>();
-
-    SubscriptionsWrapper.Item item = new SubscriptionsWrapper.Item();
-    item.price = new SubscriptionsWrapper.Price();
-    item.price.id = priceId; // Set the price ID created above
-
-    iw.data.add(item);
-    sw.items = iw;
-    
-    //Call Stripe to Create Subscription
-    try {
-      SubscriptionsWrapper stripeSubscription = StripeAPIClient.createSubscription(
-        sw
-      );
-      Logger.debug('Stripe Subscription created: ' + stripeSubscription);
-      Logger.saveLog();
-      if (stripeSubscription != null) {
-        subscription.Subscription_Id__c = stripeSubscription.id;
-        subscription.Current_Period_Start__c = SubscriptionsWrapper.convertUnixToDatetime(
-          stripeSubscription.items.data[0].current_period_start
-        );
-        subscription.Current_Period_End__c = SubscriptionsWrapper.convertUnixToDatetime(
-          stripeSubscription.items.data[0].current_period_end
-        );
-        subscription.Status__c = stripeSubscription.status;
-        subscription.Price_ID__c = stripeSubscription.items.data[0].price.id;
-
-        TriggerBypass.bypassStripeSubscription = true; // Bypass trigger to avoid recursion
-        update subscription;
-        TriggerBypass.bypassStripeSubscription = false; // Reset bypass after update
-      }
-    } catch (Exception e) {
-      Logger.error('Error creating Stripe Subscription: ' + e.getMessage());
-      Logger.saveLog();
-      throw new CalloutException(
-        'Error creating Stripe Subscription: ' + e.getMessage()
-      );
-    } */
   }
 }
