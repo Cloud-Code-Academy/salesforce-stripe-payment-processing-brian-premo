@@ -14,7 +14,6 @@
  */
 public without sharing class StripeSubscriptionEventWrapper {
   public String id;
-  //public String object_type; //object is a reserved keyword in Apex
   public DataWrapper data;
   public String type;
 

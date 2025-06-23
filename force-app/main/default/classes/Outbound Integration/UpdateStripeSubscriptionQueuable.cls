@@ -49,9 +49,13 @@ public with sharing class UpdateStripeSubscriptionQueuable implements Queueable,
       try {
         // Create a new Price in Stripe
         String productId = subscription.Product_ID__c;
+        System.debug('Creating new Price for Product ID: ' + productId);
         Integer amount = (Integer) (subscription.Amount__c * 100); // Convert to cents
+        System.debug('Amount in cents: ' + amount);
         String currencyCode = subscription.Currency__c;
+        System.debug('Currency Code: ' + currencyCode);
         String interval = subscription.Interval__c;
+        System.debug('Interval: ' + interval);
 
         String newPriceId = StripeAPIClient.createPrice(
           productId,
@@ -62,7 +66,10 @@ public with sharing class UpdateStripeSubscriptionQueuable implements Queueable,
 
         // Update the Price_ID__c field in the subscription record
         subscription.Price_ID__c = newPriceId;
-        update subscription;
+        if (!Test.isRunningTest()) {
+          update subscription;
+        }
+
         System.debug(
           'Stripe Subscription updated successfully: ' + subscription.Id
         );

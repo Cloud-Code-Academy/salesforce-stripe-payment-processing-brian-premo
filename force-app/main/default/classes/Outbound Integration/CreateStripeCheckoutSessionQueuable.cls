@@ -59,6 +59,11 @@ public with sharing class CreateStripeCheckoutSessionQueuable implements Queueab
     }
     sessionRequest.line_items.add(lineItem);
 
+    System.debug(
+      'Creating Checkout Session for Subscription: ' + subscription.Id
+    );
+    System.debug('Session Request: ' + sessionRequest);
+
     //Call the Stripe API to create a checkout session
     CheckoutSessionWrapper checkoutSession = StripeAPIClient.createCheckoutSession(
       sessionRequest

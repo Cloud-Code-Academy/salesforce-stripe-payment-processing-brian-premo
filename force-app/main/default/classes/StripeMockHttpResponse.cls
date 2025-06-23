@@ -81,11 +81,21 @@ public class StripeMockHttpResponse implements HttpCalloutMock {
   }
 
   public static StripeMockHttpResponse createCheckoutSessionSuccessResponse() {
-    String body = '{"id":"cs_test_123","object":"checkout.session","cancel_url":"https://resourceful-goat-lnfj4c-dev-ed.trailblaze.my.site.com/cancelled","collected_information":{"shipping_details":null},"consent":null,"consent_collection":null,"created":1749944920,"currency":"usd","currency_conversion":null,"customer":"cus_SUHdEVbHHF9LSn","customer_creation":null,"customer_details":{"address":null,"email":"customer@thisisacustomer.com"},"mode":"subscription","payment_method_configuration_details":{"id":"pmc_1RW1ARPuoWtmWWxELxGkOygg","parent":null},"payment_method_options":{"card":{"request_three_d_secure":"automatic"}},"payment_method_types":["card","link","cashapp","amazon_pay"],"subscription":null,"success_url":"https://resourceful-goat-lnfj4c-dev-ed.trailblaze.my.site.com/success","url":"https://checkout.stripe.com/c/pay/cs_test_a1Am3kRvzPqJ6HIK2iZ"}';
+    String body = '{"id":"cs_test_1234567890","object":"checkout.session","amount_total":3300,"currency":"usd","customer":"cus_123456","payment_status":"paid","status":"complete","url":"https://checkout.stripe.com/pay/cs_test_1234567890"}';
     return new StripeMockHttpResponse(200, 'OK', body);
   }
   public static StripeMockHttpResponse createCheckoutSessionErrorResponse() {
     String body = '{"error":{"code":"checkout_session_not_found","doc_url":"https://stripe.com/docs/error-codes/checkout-session-not-found","message":"The checkout session was not found.","param":"session","type":"invalid_request_error"}}';
+    return new StripeMockHttpResponse(404, 'Not Found', body);
+  }
+
+  public static StripeMockHttpResponse createPriceSuccessResponse() {
+    String body = '{"id":"price_12345","object":"price","active":true,"billing_scheme":"per_unit","created":1749767281,"currency":"usd","custom_unit_amount":null,"livemode":false,"lookup_key":null,"metadata":{},"nickname":null,"product":"prod_12345","recurring":{"interval":"month","interval_count":1,"usage_type":"licensed"},"tax_behavior":"unspecified","tiers_mode":null,"transform_quantity":null,"type":"recurring","unit_amount":3300,"unit_amount_decimal":"3300"}';
+    return new StripeMockHttpResponse(200, 'OK', body);
+  }
+
+  public static StripeMockHttpResponse createPriceErrorResponse() {
+    String body = '{"error":{"code":"price_not_found","doc_url":"https://stripe.com/docs/error-codes/price-not-found","message":"The price was not found.","param":"price","type":"invalid_request_error"}}';
     return new StripeMockHttpResponse(404, 'Not Found', body);
   }
 }

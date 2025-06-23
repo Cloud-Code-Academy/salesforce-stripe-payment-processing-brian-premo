@@ -19,18 +19,10 @@ public with sharing class StripeSubscriptionTriggerHandler {
 
     for (Stripe_Subscription__c subscription : newList) {
       if (TriggerBypass.bypassStripeSubscription == false) {
-        try {
-          // Call the Stripe API to create the price and product
-          System.enqueueJob(
-            new CreateStripeSubscriptionQueuable(subscription.Id)
-          );
-        } catch (Exception e) {
-          Logger.Error(
-            'Error creating Stripe subscription for ' + subscription.Id,
-            e
-          );
-          Logger.saveLog();
-        }
+        // Call the Stripe API to create the price and product
+        System.enqueueJob(
+          new CreateStripeSubscriptionQueuable(subscription.Id)
+        );
       }
     }
     update subscriptionsToUpdate;
@@ -54,17 +46,9 @@ public with sharing class StripeSubscriptionTriggerHandler {
         oldSubscription.Price_ID__c == subscription.Price_ID__c &&
         oldSubscription.Amount__c != subscription.Amount__c
       ) {
-        try {
-          System.enqueueJob(
-            new UpdateStripeSubscriptionQueuable(subscription.Id, 'update')
-          );
-        } catch (Exception e) {
-          Logger.error(
-            'Error updating Stripe subscription for ' + subscription.Id,
-            e
-          );
-          Logger.saveLog();
-        }
+        System.enqueueJob(
+          new UpdateStripeSubscriptionQueuable(subscription.Id, 'update')
+        );
       }
       //Handle Subscription Cancellation
       else if (
@@ -72,34 +56,18 @@ public with sharing class StripeSubscriptionTriggerHandler {
         oldSubscription.Status__c != subscription.Status__c &&
         subscription.Status__c == 'canceled'
       ) {
-        try {
-          System.enqueueJob(
-            new UpdateStripeSubscriptionQueuable(subscription.Id, 'cancel')
-          );
-        } catch (Exception e) {
-          Logger.error(
-            'Error canceling Stripe subscription for ' + subscription.Id,
-            e
-          );
-          Logger.saveLog();
-        }
+        System.enqueueJob(
+          new UpdateStripeSubscriptionQueuable(subscription.Id, 'cancel')
+        );
       }
       //Handle Subscription Price Update for First Time
       else if (
         oldSubscription.Price_ID__c == null &&
         oldSubscription.Price_ID__c != subscription.Price_ID__c
       ) {
-        try {
-          System.enqueueJob(
-            new CreateStripeCheckoutSessionQueuable(subscription.Id)
-          );
-        } catch (Exception e) {
-          Logger.error(
-            'Error updating Stripe subscription for ' + subscription.Id,
-            e
-          );
-          Logger.saveLog();
-        }
+        System.enqueueJob(
+          new CreateStripeCheckoutSessionQueuable(subscription.Id)
+        );
       }
     }
   }

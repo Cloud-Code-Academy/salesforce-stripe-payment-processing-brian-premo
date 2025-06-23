@@ -17,7 +17,7 @@
 public with sharing class StripeTestDataFactory {
   public static Stripe_Customer__c createStripeCustomer() {
     Stripe_Customer__c customer = new Stripe_Customer__c();
-    customer.Name = 'Test Customer';
+    customer.Name__c = 'Test Customer';
     customer.Email__c = 'test@example.com';
     customer.Phone__c = '123-456-7890';
     return customer;
@@ -25,23 +25,18 @@ public with sharing class StripeTestDataFactory {
 
   public static Stripe_Subscription__c createStripeSubscription() {
     Stripe_Subscription__c subscription = new Stripe_Subscription__c();
-    subscription.Name = 'Test Subscription';
     subscription.Product_Name__c = 'Test Product';
     subscription.Currency__c = 'usd';
     subscription.Amount__c = 1000;
     subscription.Interval__c = 'month';
-    subscription.Price_ID__c = 'price_123456';
     subscription.Quantity__c = 1;
     return subscription;
   }
 
   public static Stripe_Subscription__c createStripeSubscriptionFailure() {
     Stripe_Subscription__c subscription = new Stripe_Subscription__c();
-    //Set invalid currency to simulate failure
-    subscription.Name = 'Test Subscription';
+    //Do not set Amount to simulate failure
     subscription.Product_Name__c = 'Test Product';
-    subscription.Currency__c = 'notarealcurrency';
-    subscription.Amount__c = 1000;
     subscription.Interval__c = 'month';
     return subscription;
   }

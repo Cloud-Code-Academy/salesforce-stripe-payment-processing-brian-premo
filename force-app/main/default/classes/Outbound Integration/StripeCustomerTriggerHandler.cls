@@ -32,7 +32,8 @@ public with sharing class StripeCustomerTriggerHandler {
           // Call the Stripe API to create the customer
           System.enqueueJob(new CreateStripeCustomerQueuable(customer.Id));
         } catch (Exception e) {
-          System.debug('Error creating Stripe customer: ' + e.getMessage());
+          Logger.error('Error creating Stripe customer: ' + e.getMessage());
+          Logger.saveLog();
         }
       }
     }
