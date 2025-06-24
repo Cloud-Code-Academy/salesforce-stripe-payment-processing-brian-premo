@@ -23,16 +23,15 @@ global without sharing class WebhookResource {
   @HttpPost
   global static ResponseWrapper doPost() {
     RestRequest req = RestContext.request;
-    System.debug('Received webhook: ' + req);
     RestResponse res = RestContext.response;
     String path = WebhookResource.getWebhookTypeFromPath(req.requestURI);
-    System.debug('Processing webhook for path: ' + path);
     try {
       WebhookFactory.processWebhook(path, req);
-      System.debug('Webhook processed successfully for path: ' + path);
       res.statusCode = 200;
       return new ResponseWrapper('success', 'Webhook processed successfully');
     } catch (Exception e) {
+      Logger.error('Error processing webhook: ' + e.getMessage(), e);
+      Logger.saveLog();
       res.statusCode = 500;
       return new ResponseWrapper(
         'error',
@@ -58,7 +57,6 @@ global without sharing class WebhookResource {
    * @return The webhook type as a string
    */
   private static String getWebhookTypeFromPath(String path) {
-    System.debug('Webhook path: ' + path);
     if (path == null) {
       return '';
     }

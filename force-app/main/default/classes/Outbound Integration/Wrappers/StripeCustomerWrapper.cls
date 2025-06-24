@@ -36,7 +36,6 @@ public with sharing class StripeCustomerWrapper {
       responseBody,
       StripeCustomerWrapper.class
     );
-    System.debug('Parsed StripeCustomerWrapper: ' + wrapper);
     return wrapper;
   }
 }

@@ -1,114 +1,129 @@
-# Salesforce-Stripe Payment Processing Integration
-## Integration Developer Capstone Project
+# Salesforce Stripe Payment Processing
 
-Welcome to your capstone project! You'll be building a production-ready payment processing solution that integrates Salesforce with Stripe to manage customer subscriptions and payments.
+This repository provides a robust Salesforce (Apex) integration with Stripe(https://stripe.com/) for payment processing. It supports both inbound (webhook) and outbound (API callout) Stripe events, enabling seamless synchronization of customers, subscriptions, and payments between Salesforce and Stripe.
 
-## Project Overview
+---
 
-Your organization needs a payment processing solution that connects Salesforce with Stripe to handle customer subscriptions and payments. The finance team, sales team, and customer service representatives need to manage the complete customer payment lifecycle within Salesforce while leveraging Stripe's secure payment infrastructure.
+## Features
 
-**Project Goal**: Build an integration that allows the business to manage customers, subscriptions, and payments seamlessly between Salesforce and Stripe.
+- **Inbound Webhook Handling:**  
+  Receives and processes Stripe webhook events (e.g., customer updates, subscription changes, invoice payments) via a REST resource.
+- **Outbound Stripe API Integration:**  
+  Creates and updates Stripe customers, products, prices, and checkout sessions from Salesforce using HTTP callouts.
+- **Custom Metadata for Secrets:**  
+  Securely stores Stripe API keys in Salesforce custom metadata.
+- **Asynchronous Processing:**  
+  Uses Queueable Apex for non-blocking, scalable Stripe API interactions.
+- **Comprehensive Unit Tests:**  
+  Includes test data factories and HTTP callout mocks for reliable, isolated testing.
 
-## What You'll Build
+---
 
-### Business User Stories
+## Architecture Overview
 
-**Sales Representatives need to:**
-- Create customer records in Salesforce that automatically sync to Stripe
-- Set up new subscriptions for customers with different pricing plans
-- Generate secure payment links that customers can use to complete their subscription signup
-- Track subscription status and billing periods
+### Inbound Integration
 
-**Customer Service Representatives need to:**
-- See when customer data changes in Stripe and have it update in Salesforce automatically
-- Access complete customer payment information when helping with support requests
+- **WebhookResource:**  
+  Salesforce REST resource endpoint for Stripe webhooks.
+- **WebhookFactory:**  
+  Routes incoming events to the correct processor based on event type.
+- **StripeWebhookProcessor:**  
+  Handles business logic for each supported Stripe event (e.g., customer.updated, invoice.paid).
 
-**Finance Team Members need to:**
-- Monitor subscription renewals and cancellations
-- Track successful and failed payments
-- Receive notifications when subscriptions change status
-- Maintain records of all payment transactions
+### Outbound Integration
 
-**Customers need to:**
-- Receive secure payment links to complete subscription signup
-- Use preferred payment methods through a trusted payment interface
-- Have confidence that payment information is handled securely
+- **StripeAPIClient:**  
+  Handles HTTP callouts to Stripe for creating/updating customers, products, prices, and checkout sessions.
+- **Queueable Classes:**  
+  Asynchronous jobs for creating/updating Stripe objects and syncing results to Salesforce.
+- **Wrappers:**  
+  Classes for structuring outbound requests and parsing Stripe responses.
 
-### Core Business Processes
+### Testing
 
-**New Customer Onboarding**:
-1. Sales rep creates a Contact in Salesforce with customer details
-2. Customer information is automatically sent to Stripe to create a customer account
-3. Sales rep can set up a subscription for the customer
-4. Customer receives a secure payment link to complete signup
-5. Once payment is complete, subscription becomes active in both systems
+- **Test Data Factory:**  
+  Generates test data and sample webhook payloads.
+- **Mock Responses:**  
+  Simulates Stripe API responses for unit testing.
+- **Test Classes:**  
+  Cover both inbound and outbound logic, including signature validation and error handling.
 
-**Ongoing Customer Management**:
-1. Any customer changes in Stripe automatically update the Salesforce record
-2. Subscription status changes (renewals, cancellations, failures) are reflected in Salesforce
-3. Payment successes and failures are tracked and visible to the finance team
-4. Customer service has access to complete payment and subscription history
+---
 
-## Project Requirements
+## Setup & Configuration
 
-### Duration & Team Structure
-- **Duration**: 4 weeks
-- **Team Size**: 3 members maximum
-- **Individual Orgs**: Each team member works in separate orgs with shared GitHub repository
-- **Collaboration**: Required through Slack, virtual meetings, and code reviews
+1. **Clone the Repository:**  
+   Download or clone this repo into your Salesforce DX project or VS Code workspace.
 
-### Success Criteria
-1. **Functional Integration**: Customers, subscriptions, and payments flow seamlessly between systems
-2. **Data Accuracy**: Information is consistent and up-to-date in both Salesforce and Stripe
-3. **Security**: Payment processing meets industry security standards
-4. **Reliability**: System handles errors gracefully and retries failed operations
-5. **Usability**: Business users can manage the entire customer payment lifecycle from Salesforce
+2. **Deploy Metadata:**  
+   Deploy Apex classes, triggers, and custom metadata to your Salesforce org.
 
-### Security Requirements
-- All payment data must be handled through Stripe's secure infrastructure
-- No credit card information should be stored or processed directly in Salesforce
-- API communications must be authenticated and secure
-- Webhook data must be verified to ensure it comes from Stripe
+3. **Configure Stripe Secret Key:**
 
-## Getting Started
+   - Go to **Setup > Custom Metadata Types > API_Key_Vault**.
+   - Create a record with:
+     - **MasterLabel:** Stripe
+     - **DeveloperName:** Stripe
+     - **Secret_Key\_\_c:** (your Stripe webhook signing secret)
 
-### 1. Research Phase
-- Review the complete business requirements provided by your instructor
-- Investigate Stripe's API capabilities and Salesforce integration options
-- Understand the data flow between systems
+4. **Set Up Remote Site Settings:**
 
-### 2. Design Phase
-- Plan your data model to support the business processes
-- Design your integration architecture
-- Determine security and authentication approaches
+   - Add `https://api.stripe.com` to Remote Site Settings for outbound callouts.
 
-### 3. Build Phase
-- Implement customer synchronization (Salesforce → Stripe)
-- Build subscription management with secure checkout
-- Create webhook processing for real-time updates
-- Add comprehensive error handling and logging
+5. **Configure Stripe Webhooks:**
+   - In your Stripe dashboard, set the webhook endpoint to your Salesforce REST resource URL (e.g., `https://yourdomain.my.salesforce.com/services/apexrest/integration/stripe`). You will have to create an Experience Page to use as your resource
 
-### 4. Test & Deploy
-- Verify all business requirements are met
-- Test error scenarios and edge cases
-- Create user documentation
-- Prepare final demonstration
+---
 
-## Key Questions to Consider
+## Usage
 
-- How will you structure data in Salesforce to support the business processes?
-- What Stripe APIs will you need to accomplish these business goals?
-- How will you ensure data stays synchronized between the systems?
-- What happens when something goes wrong - how will you handle errors?
-- How will you secure the integration and protect customer data?
-- What will the user experience look like for different types of users?
+- **Inbound:**  
+  Stripe sends webhook events to your Salesforce endpoint. The system validates the signature, processes the event, and updates Salesforce records accordingly.
 
-## Additional Resources
+- **Outbound:**  
+  When a customer or subscription is created/updated in Salesforce, the system makes HTTP callouts to Stripe to sync the data.
 
-Your instructor will provide detailed project requirements and weekly planning guidance through external documentation.
+---
 
-## Remember
+## Testing
 
-The goal is to solve business problems through technology. Focus on what the business needs to accomplish, then determine the best technical approach to deliver those outcomes. This project should demonstrate your ability to build production-ready integrations that real businesses could deploy and use.
+- Run all test classes in Salesforce to verify functionality.
+- Tests use mock HTTP responses and test data factories for isolation and reliability.
 
-Good luck with your capstone project!
+---
+
+## Extending
+
+- **Add Retry Logic:**
+  - Automatically retry webhook events when they fail
+  - Store failed webhooks in a custom object
+  - Use Scheduled/Batch Apex to periodically retry failed webhooks
+- **Products and Price Custom Object:**
+  - Instead of creating new Products and Prices from the Subscription, try
+    implementing a Stripe Product Object and Price Object to more closely align
+    with Stripe's Data model.
+- **Bulkification and Performance**
+  - Ensure all DML and SOQL operations are Bulk Safe
+  - Add tests for bulk outgoing API calls and inbound webhook event processing
+- **Improved Error Handling and Logging**
+  - Build off the existing Error logging framework. Add more custom Exceptions
+    and ensure logs for important steps
+- **Notifications**
+  - Send Email or Slack message to admins on repeated failures or critical errors
+- **Advanced Features**
+  - Support for additional Stripe events like disputes and refunds
+  - Implement Idempotency for webhook processing to prevent duplicates
+
+---
+
+## Contributing
+
+1. Fork the repo and create a feature branch.
+2. Add or update tests for your changes.
+3. Submit a pull request with a clear description.
+
+---
+
+## Contact
+
+For questions or support, contact brianpremo97@gmail.com or open an issue.

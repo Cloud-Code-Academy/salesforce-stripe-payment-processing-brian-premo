@@ -54,8 +54,6 @@ public without sharing class StripeSubscriptionEventWrapper {
       StripeSubscriptionEventWrapper.class
     );
 
-    System.debug('Parsed StripeSubscriptionEventWrapper: ' + parsedResponse);
-
     return parsedResponse;
   }
 }
