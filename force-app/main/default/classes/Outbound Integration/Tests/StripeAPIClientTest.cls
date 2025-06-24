@@ -10,6 +10,7 @@
  *
  * CHANGE LOG  :
  *  - 2025-06-12 v1.0.0 Initial creation
+ *  - 2025-06-22 v1.0.1 Added tests for product and price creation
  * -----------------------------------------------------------------------------
  */
 @IsTest
@@ -91,6 +92,10 @@ public with sharing class StripeAPIClientTest {
     );
   }
   // =============================Product Tests========================================
+  /* description: Test for successful creation of a Stripe product.
+   * This test verifies that the product creation API call returns a successful response
+   * with the expected product ID in the response body.
+   */
   @isTest
   static void createProductSuccessResponse() {
     String productName = 'Test Product';
@@ -111,6 +116,10 @@ public with sharing class StripeAPIClientTest {
     );
   }
 
+  /* description: Test for failure in creating a Stripe product.
+   * This test verifies that the product creation API call returns an error response
+   * when an invalid product name is provided, such as a name that exceeds the character limit
+   */
   @isTest
   static void createProductFailure() {
     //Set a name that will cause a failure
@@ -137,6 +146,10 @@ public with sharing class StripeAPIClientTest {
 
   // =============================Price Tests===========================================
 
+  /* description: Test for successful creation of a Stripe price.
+   * This test verifies that the price creation API call returns a successful response
+   * with the expected price ID in the response body.
+   */
   @isTest
   static void createPriceSuccess() {
     String productId = 'prod_12345';
@@ -170,6 +183,10 @@ public with sharing class StripeAPIClientTest {
     );
   }
 
+  /* description: Test for failure in creating a Stripe price.
+   * This test verifies that the price creation API call returns an error response
+   * when an invalid currency code is provided, such as a non-existent currency.
+   */
   @isTest
   static void createPriceFailure() {
     Boolean exceptionThrown = false;
@@ -211,6 +228,10 @@ public with sharing class StripeAPIClientTest {
     }
   }
 
+  // =============================Subscription Tests====================================
+
+  /* description: Test for successful cancellation of a Stripe subscription.
+   */
   @isTest
   static void cancelSubscriptionSuccess() {
     String subscriptionId = 'sub_12345';

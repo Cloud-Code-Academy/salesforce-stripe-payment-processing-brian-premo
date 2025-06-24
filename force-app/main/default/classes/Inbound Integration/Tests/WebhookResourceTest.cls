@@ -14,6 +14,10 @@
  */
 @isTest
 private class WebhookResourceTest {
+  /*
+   * @description Tests the HMAC signature validation for Stripe webhooks
+   * This test simulates a valid HMAC signature and verifies that the validation method returns true
+   */
   @isTest
   static void testValidateHMACSignature() {
     String timestamp = '1234567890';
@@ -38,6 +42,10 @@ private class WebhookResourceTest {
     Assert.isTrue(isValid, 'Signature should be valid');
   }
 
+  /*
+   * @description Tests the HMAC signature validation failure for Stripe webhooks
+   * This test simulates an invalid HMAC signature and verifies that the validation method returns false
+   */
   @isTest
   static void testValidateHMACFailure() {
     String timestamp = '1234567890';
@@ -169,6 +177,10 @@ private class WebhookResourceTest {
     );
   }
 
+  /*
+   * @description Successfully processes a customer subscription updated webhook
+   * This test simulates a successful customer subscription updated webhook from Stripe
+   */
   @isTest
   static void customerSubscriptionUpdatedSuccess() {
     //Build payload using StripeSubscriptionEventWrapper
@@ -275,6 +287,10 @@ private class WebhookResourceTest {
     );
   }
 
+  /*
+   * @description Successfully processes a customer subscription created webhook
+   * This test simulates a successful customer subscription created webhook from Stripe
+   */
   @isTest
   static void customerSubscriptionCreatedSuccess() {
     //Build payload using StripeSubscriptionEventWrapper
@@ -370,6 +386,10 @@ private class WebhookResourceTest {
     );
   }
 
+  /*
+   * @description Successfully processes a customer subscription deleted webhook
+   * This test simulates a successful customer subscription deleted webhook from Stripe
+   */
   @isTest
   static void customerSubscriptionDeletedSuccess() {
     //Build payload using StripeSubscriptionEventWrapper
@@ -467,6 +487,10 @@ private class WebhookResourceTest {
     );
   }
 
+  /*
+   * @description Successfully processes an invoice payment succeeded webhook
+   * This test simulates a successful invoice payment succeeded webhook from Stripe
+   */
   @isTest
   static void invoicePaidSuccess() {
     //Build payload using InvoiceWrapper
@@ -571,6 +595,10 @@ private class WebhookResourceTest {
     );
   }
 
+  /*
+   * @description Successfully processes an invoice payment failed webhook
+   * This test simulates a successful invoice payment failed webhook from Stripe
+   */
   @isTest
   static void invoicePaidFailure() {
     //Build payload using InvoiceWrapper

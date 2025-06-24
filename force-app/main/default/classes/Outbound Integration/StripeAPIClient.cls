@@ -317,8 +317,6 @@ public with sharing class StripeAPIClient {
   /*
     description: Helper class that converts the customer request to a URL-encoded string
     @return: String - The URL-encoded string representation of the customer request
-    This method encodes the name, email, and phone fields to be used in a URL query string.
-    Example output: "name=John%20Doe&email=john.doe%40example.com&phone=1234567890"
     @param customerRequest : StripeCustomerWrapper.CustomerRequest - The customer request object containing the details of the customer to be created.
     */
   public static String toUrlEncodedString(

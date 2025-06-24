@@ -51,6 +51,12 @@ global without sharing class WebhookResource {
     }
   }
 
+  /**
+   * @description Extracts the webhook type from the request path
+   * This method parses the request path to determine the type of webhook being processed
+   * @param path The request path from which to extract the webhook type
+   * @return The webhook type as a string
+   */
   private static String getWebhookTypeFromPath(String path) {
     System.debug('Webhook path: ' + path);
     if (path == null) {

@@ -21,6 +21,11 @@ public without sharing class StripeWebhookProcessor implements IWebhookProcessor
   private static final String EVENT_INVOICE_PAYMENT_SUCCEEDED = 'invoice.payment_succeeded';
   private static final String EVENT_INVOICE_PAYMENT_FAILED = 'invoice.payment_failed';
 
+  /**
+   * @description Validates the incoming request against the Stripe HMAC signature
+   * @param request The incoming RestRequest to validate
+   * @return Boolean indicating whether the request is valid
+   */
   public static Boolean validate(RestRequest request) {
     // Verify HMAC signature using HMAC-SHA256 for Stripe webhook
     String signatureHeader = request.headers.get('Stripe-Signature'); //Example: t=1234567890,v1=abcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890
@@ -57,6 +62,11 @@ public without sharing class StripeWebhookProcessor implements IWebhookProcessor
     }
   }
 
+  /**
+   * @description Parses the Stripe signature header to extract timestamp and signature
+   * @param header The Stripe-Signature header value
+   * @return Map containing 't' (timestamp) and 'v1' (signature)
+   */
   private static Map<String, String> parseStripeSignatureHeader(String header) {
     Map<String, String> result = new Map<String, String>();
     for (String part : header.split(',')) {
@@ -68,6 +78,10 @@ public without sharing class StripeWebhookProcessor implements IWebhookProcessor
     return result;
   }
 
+  /**
+   * @description Processes the incoming webhook request, directing it to the appropriate handler based on the event type
+   * @param request The incoming RestRequest to process
+   */
   public void process(RestRequest request) {
     String requestBody = request.requestBody.toString();
     Map<String, Object> payload = (Map<String, Object>) JSON.deserializeUntyped(
@@ -96,6 +110,10 @@ public without sharing class StripeWebhookProcessor implements IWebhookProcessor
     }
   }
 
+  /**
+   * @description Processes the customer.updated event from Stripe
+   * @param payload The payload containing the customer data
+   */
   private void processCustomerUpdated(Map<String, Object> payload) {
     // Handle customer.updated event
     Map<String, Object> customerData = (Map<String, Object>) payload.get(
@@ -149,6 +167,10 @@ public without sharing class StripeWebhookProcessor implements IWebhookProcessor
     }
   }
 
+  /**
+   * @description Processes the customer.subscription.created event from Stripe
+   * @param requestBody The request body containing the subscription data
+   */
   private void processSubscriptionCreated(String requestBody) {
     //Parse the request body to get the subscription details
     StripeSubscriptionEventWrapper eventWrapper = StripeSubscriptionEventWrapper.parse(
@@ -201,6 +223,11 @@ public without sharing class StripeWebhookProcessor implements IWebhookProcessor
       }
     }
   }
+
+  /**
+   * @description Processes the customer.subscription.updated event from Stripe
+   * @param requestBody The request body containing the subscription data
+   */
   private void processSubscriptionUpdated(String requestBody) {
     //Parse the request body to get the subscription details
     StripeSubscriptionEventWrapper eventWrapper = StripeSubscriptionEventWrapper.parse(
@@ -263,6 +290,10 @@ public without sharing class StripeWebhookProcessor implements IWebhookProcessor
     }
   }
 
+  /**
+   * @description Processes the customer.subscription.deleted event from Stripe
+   * @param requestBody The request body containing the subscription data
+   */
   private void processSubscriptionDeleted(String requestBody) {
     // Handle customer.subscription.deleted event
     // Implement logic to mark subscription in Salesforce Cancelled. Also update start and end date
@@ -313,6 +344,10 @@ public without sharing class StripeWebhookProcessor implements IWebhookProcessor
     );
   }
 
+  /**
+   * @description Processes the invoice.payment_succeeded event from Stripe
+   * @param requestBody The request body containing the invoice data
+   */
   private void processInvoicePaymentSucceeded(String requestBody) {
     Logger.debug('Processing Invoice Payment Succeeded Event: ' + requestBody);
     StripeInvoiceWrapper invoiceWrapper;
@@ -387,6 +422,10 @@ public without sharing class StripeWebhookProcessor implements IWebhookProcessor
     }
   }
 
+  /**
+   * @description Processes the invoice.payment_failed event from Stripe
+   * @param requestBody The request body containing the invoice data
+   */
   private void processInvoicePaymentFailed(String requestBody) {
     Logger.debug('Processing Invoice Payment Failed Event: ' + requestBody);
     StripeInvoiceWrapper invoiceWrapper;
