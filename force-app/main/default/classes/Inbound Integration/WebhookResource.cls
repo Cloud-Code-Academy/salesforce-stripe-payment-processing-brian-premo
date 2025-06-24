@@ -29,6 +29,7 @@ global without sharing class WebhookResource {
     System.debug('Processing webhook for path: ' + path);
     try {
       WebhookFactory.processWebhook(path, req);
+      System.debug('Webhook processed successfully for path: ' + path);
       res.statusCode = 200;
       return new ResponseWrapper('success', 'Webhook processed successfully');
     } catch (Exception e) {
@@ -50,6 +51,12 @@ global without sharing class WebhookResource {
     }
   }
 
+  /**
+   * @description Extracts the webhook type from the request path
+   * This method parses the request path to determine the type of webhook being processed
+   * @param path The request path from which to extract the webhook type
+   * @return The webhook type as a string
+   */
   private static String getWebhookTypeFromPath(String path) {
     System.debug('Webhook path: ' + path);
     if (path == null) {

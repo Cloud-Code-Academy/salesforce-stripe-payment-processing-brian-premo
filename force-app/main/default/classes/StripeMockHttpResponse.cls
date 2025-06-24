@@ -98,4 +98,19 @@ public class StripeMockHttpResponse implements HttpCalloutMock {
     String body = '{"error":{"code":"price_not_found","doc_url":"https://stripe.com/docs/error-codes/price-not-found","message":"The price was not found.","param":"price","type":"invalid_request_error"}}';
     return new StripeMockHttpResponse(404, 'Not Found', body);
   }
+
+  public static StripeMockHttpResponse createProductSuccessResponse() {
+    String body = '{"id":"prod_12345","object":"product","active":true,"attributes":[],"created":1749767281,"description":null,"images":[],"livemode":false,"metadata":{},"name":"Test Product","package_dimensions":null,"shippable":false,"type":"service","unit_label":null}';
+    return new StripeMockHttpResponse(200, 'OK', body);
+  }
+
+  public static StripeMockHttpResponse createProductErrorResponse() {
+    String body = '{"error":{"code":"product_not_found","doc_url":"https://stripe.com/docs/error-codes/product-not-found","message":"The product was not found.","param":"product","type":"invalid_request_error"}}';
+    return new StripeMockHttpResponse(404, 'Not Found', body);
+  }
+
+  public static StripeMockHttpResponse createCancelSubscriptionResponse() {
+    String body = '{"id":"sub_123456","object":"subscription","cancel_at_period_end":false,"canceled_at":1749501061,"customer":"cus_ST8PC2IDsNNBrt","status":"canceled"}';
+    return new StripeMockHttpResponse(200, 'OK', body);
+  }
 }

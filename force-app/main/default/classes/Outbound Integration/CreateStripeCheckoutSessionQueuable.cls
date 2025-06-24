@@ -12,7 +12,6 @@
  * -----------------------------------------------------------------------------
  */
 public with sharing class CreateStripeCheckoutSessionQueuable implements Queueable, Database.AllowsCallouts {
-  // Add any parameters you need to pass to the queueable
   private Id stripeSubscriptionId;
 
   public CreateStripeCheckoutSessionQueuable(Id stripeSubscriptionId) {
@@ -50,7 +49,7 @@ public with sharing class CreateStripeCheckoutSessionQueuable implements Queueab
     sessionRequest.currency_code = subscription.Currency__c;
 
     CheckoutSessionWrapper.LineItem lineItem = new CheckoutSessionWrapper.LineItem();
-    lineItem.price = subscription.Price_ID__c; // Assuming this is the price ID
+    lineItem.price = subscription.Price_ID__c;
 
     if (subscription.Quantity__c == null) {
       lineItem.quantity = 1; // Default to 1 if quantity is not set
@@ -58,11 +57,6 @@ public with sharing class CreateStripeCheckoutSessionQueuable implements Queueab
       lineItem.quantity = (Integer) subscription.Quantity__c;
     }
     sessionRequest.line_items.add(lineItem);
-
-    System.debug(
-      'Creating Checkout Session for Subscription: ' + subscription.Id
-    );
-    System.debug('Session Request: ' + sessionRequest);
 
     //Call the Stripe API to create a checkout session
     CheckoutSessionWrapper checkoutSession = StripeAPIClient.createCheckoutSession(

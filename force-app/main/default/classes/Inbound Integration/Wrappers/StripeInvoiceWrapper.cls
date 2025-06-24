@@ -16,6 +16,7 @@ public class StripeInvoiceWrapper {
   public String id;
   public String created;
   public DataWrapper data;
+  public String type;
 
   public class DataWrapper {
     public ObjectWrapper object_wrapper;
