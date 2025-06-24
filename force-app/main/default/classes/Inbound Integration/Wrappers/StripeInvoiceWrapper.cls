@@ -59,7 +59,6 @@ public class StripeInvoiceWrapper {
       StripeInvoiceWrapper.class
     );
 
-    System.debug('Parsed StripeInvoiceWrapper: ' + parsedResponse);
     return parsedResponse;
   }
 }

@@ -82,7 +82,6 @@ private class StripeSubscriptionTriggerTest {
       Test.stopTest();
     } catch (Exception e) {
       exceptionThrown = true;
-      System.debug('Expected exception caught: ' + e.getMessage());
     }
 
     // Assertions to verify error response

@@ -87,9 +87,7 @@ public without sharing class StripeWebhookProcessor implements IWebhookProcessor
     Map<String, Object> payload = (Map<String, Object>) JSON.deserializeUntyped(
       requestBody
     );
-    System.debug('REQUEST BODY RECEIVED *#$*#$*#*$*# = ' + requestBody);
     String webhookEvent = (String) payload.get('type');
-    System.debug('WEBHOOK EVENT RETURNED *#$*#$*#*$*# = ' + webhookEvent);
 
     if (webhookEvent == EVENT_CUSTOMER_UPDATED) {
       processCustomerUpdated(payload);
@@ -143,8 +141,6 @@ public without sharing class StripeWebhookProcessor implements IWebhookProcessor
       LIMIT 1
     ];
 
-    System.debug('Stripe Customer: ' + stripeCustomer);
-
     if (stripeCustomer != null) {
       // Update the Stripe_Customer__c record with new values
       stripeCustomer.Name__c = customerName;
@@ -155,11 +151,9 @@ public without sharing class StripeWebhookProcessor implements IWebhookProcessor
       // Save the updated record
       try {
         update stripeCustomer;
-        System.debug(
-          'Stripe Customer updated successfully: ' + stripeCustomer.Id
-        );
       } catch (DMLException e) {
-        System.debug('Error updating Stripe Customer: ' + e.getMessage());
+        Logger.error('Error updating Stripe Customer: ' + e.getMessage());
+        Logger.saveLog();
         throw new WebhookFactory.WebhookException(
           'Error updating Stripe Customer: ' + e.getMessage()
         );
@@ -177,12 +171,9 @@ public without sharing class StripeWebhookProcessor implements IWebhookProcessor
       requestBody
     );
     String subscriptionID = eventWrapper.data.object_wrapper.id;
-    System.debug('Subscription ID: ' + subscriptionID);
-    System.debug('Parsed Stripe Subscription Create Event: ' + eventWrapper);
 
     // Extract subscription details from the event wrapper
     StripeSubscriptionEventWrapper.ObjectWrapper subscriptionObject = eventWrapper.data.object_wrapper;
-    System.debug('Subscription Object: ' + subscriptionObject);
 
     // Query the Stripe_Subscription__c record in Salesforce using the price ID to match
     String priceID = subscriptionObject.items.data[0].price.id;
@@ -212,11 +203,9 @@ public without sharing class StripeWebhookProcessor implements IWebhookProcessor
       // Save the updated record
       try {
         update stripeSubscription;
-        System.debug(
-          'Stripe Subscription created successfully: ' + stripeSubscription.Id
-        );
       } catch (Exception e) {
-        System.debug('Error updating Stripe Subscription: ' + e.getMessage());
+        Logger.error('Error updating Stripe Subscription: ' + e.getMessage());
+        Logger.saveLog();
         throw new WebhookFactory.WebhookException(
           'Error updating Stripe Subscription: ' + e.getMessage()
         );
@@ -234,13 +223,9 @@ public without sharing class StripeWebhookProcessor implements IWebhookProcessor
       requestBody
     );
     String subscriptionID = eventWrapper.data.object_wrapper.id;
-    System.debug('Subscription ID: ' + subscriptionID);
-    System.debug('Parsed Stripe Subscription Update Event: ' + eventWrapper);
 
     // Extract subscription details from the event wrapper
     StripeSubscriptionEventWrapper.ObjectWrapper subscriptionObject = eventWrapper.data.object_wrapper;
-
-    System.debug('Subscription Object: ' + subscriptionObject);
 
     // Query the Stripe_Subscription__c record in Salesforce
     Stripe_Subscription__c stripeSubscription = [
@@ -278,11 +263,9 @@ public without sharing class StripeWebhookProcessor implements IWebhookProcessor
       // Save the updated record
       try {
         update stripeSubscription;
-        System.debug(
-          'Stripe Subscription updated successfully: ' + stripeSubscription.Id
-        );
       } catch (Exception e) {
-        System.debug('Error updating Stripe Subscription: ' + e.getMessage());
+        Logger.error('Error updating Stripe Subscription: ' + e.getMessage());
+        Logger.saveLog();
         throw new WebhookFactory.WebhookException(
           'Error updating Stripe Subscription: ' + e.getMessage()
         );
@@ -301,9 +284,6 @@ public without sharing class StripeWebhookProcessor implements IWebhookProcessor
       requestBody
     );
     String subscriptionID = eventWrapper.data.object_wrapper.id;
-
-    System.debug('Subscription ID: ' + subscriptionID);
-    System.debug('Parsed Stripe Subscription Delete Event: ' + eventWrapper);
 
     // Extract subscription details from the event wrapper
     StripeSubscriptionEventWrapper.ObjectWrapper subscriptionObject = eventWrapper.data.object_wrapper;
@@ -328,20 +308,14 @@ public without sharing class StripeWebhookProcessor implements IWebhookProcessor
       // Save the updated record
       try {
         update stripeSubscription;
-        System.debug(
-          'Stripe Subscription marked as cancelled: ' + stripeSubscription.Id
-        );
       } catch (Exception e) {
-        System.debug('Error updating Stripe Subscription: ' + e.getMessage());
+        Logger.error('Error updating Stripe Subscription: ' + e.getMessage());
+        Logger.saveLog();
         throw new WebhookFactory.WebhookException(
           'Error updating Stripe Subscription: ' + e.getMessage()
         );
       }
     }
-    System.debug(
-      'Stripe Subscription deleted event processed successfully for ID: ' +
-      subscriptionID
-    );
   }
 
   /**
@@ -410,9 +384,6 @@ public without sharing class StripeWebhookProcessor implements IWebhookProcessor
 
     try {
       insert paymentTransaction;
-      System.debug(
-        'Payment Transaction created successfully: ' + paymentTransaction.Id
-      );
     } catch (Exception e) {
       Logger.error('Error creating Payment Transaction: ' + e.getMessage());
       Logger.saveLog();

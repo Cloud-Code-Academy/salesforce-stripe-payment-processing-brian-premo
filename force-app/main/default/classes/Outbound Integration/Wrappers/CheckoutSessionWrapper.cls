@@ -20,7 +20,6 @@ public class CheckoutSessionWrapper {
         responseBody,
         CheckoutSessionWrapper.class
       );
-      System.debug('Parsed CheckoutSessionWrapper: ' + wrapper);
       Logger.debug('Parsed CheckoutSessionWrapper: ' + wrapper);
       Logger.saveLog();
       return wrapper;
@@ -30,21 +29,16 @@ public class CheckoutSessionWrapper {
   public static String toFormBody(CheckoutSessionWrapper session) {
     List<String> parts = new List<String>();
     parts.add('mode=' + EncodingUtil.urlEncode(session.mode, 'UTF-8'));
-    System.debug('Parts before URL encoding: ' + parts);
     parts.add(
       'success_url=' + EncodingUtil.urlEncode(session.success_url, 'UTF-8')
     );
-    System.debug('Parts after URL encoding: ' + parts);
     parts.add(
       'cancel_url=' + EncodingUtil.urlEncode(session.cancel_url, 'UTF-8')
     );
-    System.debug('Parts after cancel_url encoding: ' + parts);
     parts.add('customer=' + EncodingUtil.urlEncode(session.customer, 'UTF-8'));
-    System.debug('Parts after customer encoding: ' + parts);
     parts.add(
       'currency=' + EncodingUtil.urlEncode(session.currency_code, 'UTF-8')
     );
-    System.debug('Parts after currency encoding: ' + parts);
 
     for (Integer i = 0; i < session.line_items.size(); i++) {
       parts.add(
@@ -60,7 +54,6 @@ public class CheckoutSessionWrapper {
           String.valueOf(session.line_items[i].quantity)
       );
     }
-    System.debug('Checkout Session Form Body: ' + parts);
     Logger.debug('Form body parts: ' + parts);
     Logger.saveLog();
     return String.join(parts, '&');

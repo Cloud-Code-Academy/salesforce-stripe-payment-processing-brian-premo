@@ -82,15 +82,10 @@ private class WebhookResourceTest {
     TriggerBypass.bypassStripeCustomer = true;
     insert customer;
     TriggerBypass.bypassStripeCustomer = false;
-    System.debug(
-      'Created test customer in WebhookResourceTest Class: ' + customer
-    );
 
     // Prepare the payload (use the same as your customer.updated event)
     String payload = StripeTestDataFactory.webhookCustomerUpdatedBody();
     String timestamp = String.valueOf(Datetime.now().getTime() / 1000);
-    System.debug('Payload: ' + payload);
-    System.debug('Timestamp: ' + timestamp);
 
     // Generate the signature
     String signedPayload = timestamp + '.' + payload;
@@ -113,7 +108,6 @@ private class WebhookResourceTest {
 
     RestResponse res = new RestResponse();
     RestContext.request = req;
-    System.debug('RestContext Request: ' + RestContext.request);
 
     // Call webhook processor
     Test.startTest();
@@ -186,7 +180,6 @@ private class WebhookResourceTest {
     //Build payload using StripeSubscriptionEventWrapper
     String payload = StripeTestDataFactory.webhookSubscriptionUpdatedWrapper();
     StripeSubscriptionEventWrapper.parse(payload);
-    System.debug('Payload: ' + payload);
 
     //Create a test customer
     Stripe_Customer__c customer = StripeTestDataFactory.createStripeCustomer();
@@ -227,7 +220,6 @@ private class WebhookResourceTest {
 
     RestResponse res = new RestResponse();
     RestContext.request = req;
-    System.debug('RestContext Request: ' + RestContext.request);
 
     Test.startTest();
     // This try-catch return is a workaround to prevent the test from failing due to null
@@ -296,7 +288,6 @@ private class WebhookResourceTest {
     //Build payload using StripeSubscriptionEventWrapper
     String payload = StripeTestDataFactory.webhookSubscriptionCreatedWrapper();
     StripeSubscriptionEventWrapper.parse(payload);
-    System.debug('Payload: ' + payload);
 
     //Create a test customer
     Stripe_Customer__c customer = StripeTestDataFactory.createStripeCustomer();
@@ -336,7 +327,6 @@ private class WebhookResourceTest {
 
     RestResponse res = new RestResponse();
     RestContext.request = req;
-    System.debug('RestContext Request: ' + RestContext.request);
 
     Test.startTest();
     // This try-catch return is a workaround to prevent the test from failing due to null
@@ -395,7 +385,6 @@ private class WebhookResourceTest {
     //Build payload using StripeSubscriptionEventWrapper
     String payload = StripeTestDataFactory.webhookSubscriptionDeletedWrapper();
     StripeSubscriptionEventWrapper.parse(payload);
-    System.debug('Payload: ' + payload);
 
     //Create a test customer
     Stripe_Customer__c customer = StripeTestDataFactory.createStripeCustomer();
@@ -437,7 +426,6 @@ private class WebhookResourceTest {
 
     RestResponse res = new RestResponse();
     RestContext.request = req;
-    System.debug('RestContext Request: ' + RestContext.request);
 
     Test.startTest();
     // This try-catch return is a workaround to prevent the test from failing due to null
@@ -496,7 +484,6 @@ private class WebhookResourceTest {
     //Build payload using InvoiceWrapper
     String payload = StripeTestDataFactory.webhookInvoicePaymentSucceededWrapper();
     StripeSubscriptionEventWrapper.parse(payload);
-    System.debug('Payload: ' + payload);
 
     //Create a test customer
     Stripe_Customer__c customer = StripeTestDataFactory.createStripeCustomer();
@@ -536,7 +523,6 @@ private class WebhookResourceTest {
 
     RestResponse res = new RestResponse();
     RestContext.request = req;
-    System.debug('RestContext Request: ' + RestContext.request);
 
     Test.startTest();
     // This try-catch return is a workaround to prevent the test from failing due to null
@@ -604,7 +590,6 @@ private class WebhookResourceTest {
     //Build payload using InvoiceWrapper
     String payload = StripeTestDataFactory.webhookInvoicePaymentFailureWrapper();
     StripeSubscriptionEventWrapper.parse(payload);
-    System.debug('Payload: ' + payload);
 
     //Create a test customer
     Stripe_Customer__c customer = StripeTestDataFactory.createStripeCustomer();
@@ -644,7 +629,6 @@ private class WebhookResourceTest {
 
     RestResponse res = new RestResponse();
     RestContext.request = req;
-    System.debug('RestContext Request: ' + RestContext.request);
 
     Test.startTest();
     // This try-catch return is a workaround to prevent the test from failing due to null

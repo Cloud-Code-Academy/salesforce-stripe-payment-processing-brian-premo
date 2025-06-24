@@ -63,7 +63,6 @@ public with sharing class CreateStripeSubscriptionQueuable implements Queueable,
     subscription.Price_ID__c = priceId;
     subscription.Status__c = 'Incomplete';
     subscription.Product_Id__c = productId;
-    System.debug('Stripe Subscription created with Price ID: ' + priceId);
     try {
       update subscription;
     } catch (Exception e) {
