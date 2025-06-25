@@ -1,10 +1,9 @@
-<?xml version="1.0" encoding="UTF-8" ?>
-<CustomField xmlns="https://soap.sforce.com/2006/04/metadata">
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
     <fullName>Subscription_Status__c</fullName>
-    <externalId>false</externalId>
     <label>Subscription Status</label>
     <required>false</required>
-    <trackHistory>true</trackHistory>
+    <trackHistory>false</trackHistory>
     <trackTrending>false</trackTrending>
     <type>Picklist</type>
     <valueSet>
@@ -12,29 +11,44 @@
         <valueSetDefinition>
             <sorted>false</sorted>
             <value>
-                <fullName>None</fullName>
-                <default>true</default>
-                <label>None</label>
+                <fullName>incomplete</fullName>
+                <default>false</default>
+                <label>incomplete</label>
             </value>
             <value>
-                <fullName>Active</fullName>
+                <fullName>incomplete expired</fullName>
                 <default>false</default>
-                <label>Active</label>
+                <label>incomplete expired</label>
             </value>
             <value>
-                <fullName>Past Due</fullName>
+                <fullName>trialing</fullName>
                 <default>false</default>
-                <label>Past Due</label>
+                <label>trialing</label>
             </value>
             <value>
-                <fullName>Canceled</fullName>
+                <fullName>active</fullName>
                 <default>false</default>
-                <label>Canceled</label>
+                <label>active</label>
             </value>
             <value>
-                <fullName>Unpaid</fullName>
+                <fullName>past due</fullName>
                 <default>false</default>
-                <label>Unpaid</label>
+                <label>past due</label>
+            </value>
+            <value>
+                <fullName>canceled</fullName>
+                <default>false</default>
+                <label>canceled</label>
+            </value>
+            <value>
+                <fullName>unpaid</fullName>
+                <default>false</default>
+                <label>unpaid</label>
+            </value>
+            <value>
+                <fullName>paused</fullName>
+                <default>false</default>
+                <label>paused</label>
             </value>
         </valueSetDefinition>
     </valueSet>

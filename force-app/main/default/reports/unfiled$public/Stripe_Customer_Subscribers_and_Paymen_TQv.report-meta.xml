@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Report xmlns="http://soap.sforce.com/2006/04/metadata">
+    <columns>
+        <field>Contact.Stripe_Customers__r.Stripe_Subscriptions__r$Name</field>
+    </columns>
+    <columns>
+        <field>Contact.Stripe_Customers__r.Stripe_Subscriptions__r$Status__c</field>
+    </columns>
+    <columns>
+        <field>Contact.Stripe_Customers__r.Stripe_Subscriptions__r.Payment_Transactions__r$Stripe_Customer__c</field>
+    </columns>
+    <columns>
+        <field>Contact.Stripe_Customers__r.Stripe_Subscriptions__r.Payment_Transactions__r$Name</field>
+    </columns>
+    <columns>
+        <field>Contact.Stripe_Customers__r.Stripe_Subscriptions__r.Payment_Transactions__r$Status__c</field>
+    </columns>
+    <columns>
+        <aggregateTypes>Sum</aggregateTypes>
+        <field>Contact.Stripe_Customers__r.Stripe_Subscriptions__r.Payment_Transactions__r$Amount__c</field>
+    </columns>
+    <format>Summary</format>
+    <groupingsDown>
+        <dateGranularity>Day</dateGranularity>
+        <field>Contact.Stripe_Customers__r$Name__c</field>
+        <sortOrder>Asc</sortOrder>
+    </groupingsDown>
+    <name>Stripe Customer, Subscribers, and Paymen</name>
+    <params>
+        <name>co</name>
+        <value>1</value>
+    </params>
+    <reportType>Payment_Transactions_with_Subscriptions_and_Customers__c</reportType>
+    <scope>organization</scope>
+    <showDetails>true</showDetails>
+    <showGrandTotal>true</showGrandTotal>
+    <showSubTotals>true</showSubTotals>
+    <timeFrameFilter>
+        <dateColumn>Contact$Birthdate</dateColumn>
+        <interval>INTERVAL_CUSTOM</interval>
+    </timeFrameFilter>
+</Report>

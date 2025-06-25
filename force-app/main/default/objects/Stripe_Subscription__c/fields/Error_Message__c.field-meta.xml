@@ -1,12 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<CustomField xmlns="https://soap.sforce.com/2006/04/metadata">
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
     <fullName>Error_Message__c</fullName>
-    <description>Error message if subscription sync fails</description>
     <label>Error Message</label>
-    <length>32768</length>
     <required>false</required>
-    <trackFeedHistory>false</trackFeedHistory>
     <trackHistory>false</trackHistory>
-    <type>LongTextArea</type>
-    <visibleLines>3</visibleLines>
+    <trackTrending>false</trackTrending>
+    <type>TextArea</type>
 </CustomField>

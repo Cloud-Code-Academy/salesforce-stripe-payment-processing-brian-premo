@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Propration_Behavior__c</fullName>
+    <description>If you want to charge for an upgrade immediately, pass proration behavior as always invoice to create prorations, automatically invoice the customer for those proration adjustments, and attempt to collect payment. If you pass create prorations, the prorations are created but not automatically invoiced. If you don’t want to prorate, set the proration behavior option to none</description>
+    <inlineHelpText>If you want to charge for an upgrade immediately, pass proration behavior as always invoice to create prorations, automatically invoice the customer for those proration adjustments, and attempt to collect payment. If you pass create prorations, the prorations are created but not automatically invoiced. If you don’t want to prorate, set the proration behavior option to none</inlineHelpText>
+    <label>Proration Behavior</label>
+    <required>false</required>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Picklist</type>
+    <valueSet>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>always_invoice</fullName>
+                <default>false</default>
+                <label>always_invoice</label>
+            </value>
+            <value>
+                <fullName>create_prorations</fullName>
+                <default>false</default>
+                <label>create_prorations</label>
+            </value>
+            <value>
+                <fullName>none</fullName>
+                <default>false</default>
+                <label>none</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>
