@@ -1,39 +1,29 @@
-<?xml version="1.0" encoding="UTF-8" ?>
-<CustomField xmlns="https://soap.sforce.com/2006/04/metadata">
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
     <fullName>Sync_Status__c</fullName>
-    <description>Status of synchronization with Stripe</description>
     <label>Sync Status</label>
     <required>false</required>
-    <trackFeedHistory>false</trackFeedHistory>
     <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
     <type>Picklist</type>
     <valueSet>
         <restricted>true</restricted>
         <valueSetDefinition>
-            <value>
-                <fullName>Draft</fullName>
-                <default>true</default>
-                <label>Draft</label>
-            </value>
-            <value>
-                <fullName>Send to Stripe</fullName>
-                <default>false</default>
-                <label>Send to Stripe</label>
-            </value>
+            <sorted>false</sorted>
             <value>
                 <fullName>Pending</fullName>
-                <default>false</default>1
-                <label>Pending</label>
-            </value>
-            <value>
-                <fullName>Synced</fullName>
                 <default>false</default>
-                <label>Synced</label>
+                <label>Pending</label>
             </value>
             <value>
                 <fullName>Checkout Created</fullName>
                 <default>false</default>
                 <label>Checkout Created</label>
+            </value>
+            <value>
+                <fullName>Completed</fullName>
+                <default>false</default>
+                <label>Completed</label>
             </value>
             <value>
                 <fullName>Failed</fullName>

@@ -1,14 +1,13 @@
-<?xml version="1.0" encoding="UTF-8" ?>
-<CustomField xmlns="https://soap.sforce.com/2006/04/metadata">
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
     <fullName>Stripe_Customer__c</fullName>
-    <deleteConstraint>SetNull</deleteConstraint>
-    <externalId>false</externalId>
+    <deleteConstraint>Restrict</deleteConstraint>
     <label>Stripe Customer</label>
     <referenceTo>Stripe_Customer__c</referenceTo>
     <relationshipLabel>Stripe Subscriptions</relationshipLabel>
     <relationshipName>Stripe_Subscriptions</relationshipName>
-    <required>false</required>
-    <trackHistory>true</trackHistory>
+    <required>true</required>
+    <trackHistory>false</trackHistory>
     <trackTrending>false</trackTrending>
     <type>Lookup</type>
 </CustomField>

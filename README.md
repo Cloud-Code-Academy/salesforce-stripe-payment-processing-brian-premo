@@ -66,11 +66,16 @@ This repository provides a robust Salesforce (Apex) integration with Stripe(http
      - **DeveloperName:** Stripe
      - **Secret_Key\_\_c:** (your Stripe webhook signing secret)
 
-4. **Set Up Remote Site Settings:**
+4. **Add Authorization Token to Named Credential:**
+
+   - Go to **Setup > External Credentials**
+   - Update the Stripe Principal's Authorization Parameter to contain your Bearer Token
+
+5. **Set Up Remote Site Settings:**
 
    - Add `https://api.stripe.com` to Remote Site Settings for outbound callouts.
 
-5. **Configure Stripe Webhooks:**
+6. **Configure Stripe Webhooks:**
    - In your Stripe dashboard, set the webhook endpoint to your Salesforce REST resource URL (e.g., `https://yourdomain.my.salesforce.com/services/apexrest/integration/stripe`). You will have to create an Experience Page to use as your resource
 
 ---

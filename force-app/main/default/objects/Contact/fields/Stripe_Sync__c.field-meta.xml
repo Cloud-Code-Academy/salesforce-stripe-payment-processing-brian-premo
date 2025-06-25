@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Stripe_Sync__c</fullName>
+    <defaultValue>false</defaultValue>
+    <description>Check this box if you would like to create a Stripe_Customer__c record and sync it to Stripe</description>
+    <inlineHelpText>Check this box if you would like to create a Stripe_Customer__c record and sync it to Stripe</inlineHelpText>
+    <label>Stripe Sync</label>
+    <trackFeedHistory>false</trackFeedHistory>
+    <type>Checkbox</type>
+</CustomField>

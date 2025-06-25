@@ -1,33 +1,52 @@
-<?xml version="1.0" encoding="UTF-8" ?>
-<PermissionSet xmlns="https://soap.sforce.com/2006/04/metadata">
-    <applicationVisibilities>
-        <application>standard__LightningSales</application>
-        <visible>true</visible>
-    </applicationVisibilities>
-    <applicationVisibilities>
-        <application>Stripe_Payment_Processing</application>
-        <visible>true</visible>
-    </applicationVisibilities>
-    <description
-	>Provides full access to Stripe integration objects and fields for managing customer payments, subscriptions, and transactions.</description>
+<?xml version="1.0" encoding="UTF-8"?>
+<PermissionSet xmlns="http://soap.sforce.com/2006/04/metadata">
+    <externalCredentialPrincipalAccesses>
+        <enabled>true</enabled>
+        <externalCredentialPrincipal>Stripe_API-Stripe_Principal</externalCredentialPrincipal>
+    </externalCredentialPrincipalAccesses>
     <fieldPermissions>
         <editable>true</editable>
-        <field>Contact.Stripe_Customer_ID__c</field>
+        <field>Payment_Transaction__c.Amount__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>true</editable>
+        <field>Payment_Transaction__c.Currency__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>true</editable>
+        <field>Payment_Transaction__c.Customer__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>true</editable>
+        <field>Payment_Transaction__c.Payment_Method_Type__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>true</editable>
+        <field>Payment_Transaction__c.Status__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>true</editable>
+        <field>Payment_Transaction__c.Stripe_Payment_Intent_Id__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>true</editable>
+        <field>Payment_Transaction__c.Stripe_Subscription__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>true</editable>
+        <field>Payment_Transaction__c.Transaction_Date__c</field>
         <readable>true</readable>
     </fieldPermissions>
     <fieldPermissions>
         <editable>true</editable>
         <field>Stripe_Customer__c.Contact__c</field>
-        <readable>true</readable>
-    </fieldPermissions>
-    <fieldPermissions>
-        <editable>true</editable>
-        <field>Stripe_Customer__c.Customer_Name__c</field>
-        <readable>true</readable>
-    </fieldPermissions>
-    <fieldPermissions>
-        <editable>true</editable>
-        <field>Stripe_Customer__c.Customer_Phone__c</field>
         <readable>true</readable>
     </fieldPermissions>
     <fieldPermissions>
@@ -52,6 +71,11 @@
     </fieldPermissions>
     <fieldPermissions>
         <editable>true</editable>
+        <field>Stripe_Subscription__c.Checkout_Url__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>true</editable>
         <field>Stripe_Subscription__c.Currency__c</field>
         <readable>true</readable>
     </fieldPermissions>
@@ -67,42 +91,7 @@
     </fieldPermissions>
     <fieldPermissions>
         <editable>true</editable>
-        <field>Stripe_Subscription__c.Product_Plan_Name__c</field>
-        <readable>true</readable>
-    </fieldPermissions>
-    <fieldPermissions>
-        <editable>true</editable>
-        <field>Stripe_Subscription__c.Status__c</field>
-        <readable>true</readable>
-    </fieldPermissions>
-    <fieldPermissions>
-        <editable>true</editable>
-        <field>Stripe_Subscription__c.Stripe_Customer__c</field>
-        <readable>true</readable>
-    </fieldPermissions>
-    <fieldPermissions>
-        <editable>true</editable>
-        <field>Stripe_Subscription__c.Stripe_Subscription_ID__c</field>
-        <readable>true</readable>
-    </fieldPermissions>
-    <fieldPermissions>
-        <editable>true</editable>
-        <field>Stripe_Subscription__c.Stripe_Checkout_Session_ID__c</field>
-        <readable>true</readable>
-    </fieldPermissions>
-    <fieldPermissions>
-        <editable>true</editable>
-        <field>Stripe_Subscription__c.Checkout_URL__c</field>
-        <readable>true</readable>
-    </fieldPermissions>
-    <fieldPermissions>
-        <editable>true</editable>
-        <field>Stripe_Subscription__c.Stripe_Price_ID__c</field>
-        <readable>true</readable>
-    </fieldPermissions>
-    <fieldPermissions>
-        <editable>true</editable>
-        <field>Stripe_Subscription__c.Sync_Status__c</field>
+        <field>Stripe_Subscription__c.Customer__c</field>
         <readable>true</readable>
     </fieldPermissions>
     <fieldPermissions>
@@ -112,31 +101,42 @@
     </fieldPermissions>
     <fieldPermissions>
         <editable>true</editable>
-        <field>Payment_Transaction__c.Payment_Method_Type__c</field>
+        <field>Stripe_Subscription__c.Product_Name__c</field>
         <readable>true</readable>
     </fieldPermissions>
     <fieldPermissions>
         <editable>true</editable>
-        <field>Payment_Transaction__c.Status__c</field>
+        <field>Stripe_Subscription__c.Status__c</field>
         <readable>true</readable>
     </fieldPermissions>
     <fieldPermissions>
         <editable>true</editable>
-        <field>Payment_Transaction__c.Stripe_Customer__c</field>
+        <field>Stripe_Subscription__c.Stripe_Checkout__c</field>
         <readable>true</readable>
     </fieldPermissions>
     <fieldPermissions>
         <editable>true</editable>
-        <field>Payment_Transaction__c.Stripe_Payment_Intent_ID__c</field>
+        <field>Stripe_Subscription__c.Subscription_Id__c</field>
         <readable>true</readable>
     </fieldPermissions>
     <fieldPermissions>
         <editable>true</editable>
-        <field>Payment_Transaction__c.Stripe_Subscription__c</field>
+        <field>Stripe_Subscription__c.Sync_Status__c</field>
         <readable>true</readable>
     </fieldPermissions>
     <hasActivationRequired>false</hasActivationRequired>
     <label>Stripe Integration User</label>
+    <license>Salesforce Integration</license>
+    <objectPermissions>
+        <allowCreate>true</allowCreate>
+        <allowDelete>true</allowDelete>
+        <allowEdit>true</allowEdit>
+        <allowRead>true</allowRead>
+        <modifyAllRecords>false</modifyAllRecords>
+        <object>Payment_Transaction__c</object>
+        <viewAllFields>false</viewAllFields>
+        <viewAllRecords>false</viewAllRecords>
+    </objectPermissions>
     <objectPermissions>
         <allowCreate>true</allowCreate>
         <allowDelete>true</allowDelete>
@@ -144,6 +144,7 @@
         <allowRead>true</allowRead>
         <modifyAllRecords>false</modifyAllRecords>
         <object>Stripe_Customer__c</object>
+        <viewAllFields>false</viewAllFields>
         <viewAllRecords>false</viewAllRecords>
     </objectPermissions>
     <objectPermissions>
@@ -153,27 +154,19 @@
         <allowRead>true</allowRead>
         <modifyAllRecords>false</modifyAllRecords>
         <object>Stripe_Subscription__c</object>
+        <viewAllFields>false</viewAllFields>
         <viewAllRecords>false</viewAllRecords>
     </objectPermissions>
-    <objectPermissions>
-        <allowCreate>true</allowCreate>
-        <allowDelete>true</allowDelete>
-        <allowEdit>true</allowEdit>
-        <allowRead>true</allowRead>
-        <modifyAllRecords>false</modifyAllRecords>
-        <object>Payment_Transaction__c</object>
-        <viewAllRecords>false</viewAllRecords>
-    </objectPermissions>
+    <tabSettings>
+        <tab>Payment_Transaction__c</tab>
+        <visibility>Visible</visibility>
+    </tabSettings>
     <tabSettings>
         <tab>Stripe_Customer__c</tab>
         <visibility>Visible</visibility>
     </tabSettings>
     <tabSettings>
         <tab>Stripe_Subscription__c</tab>
-        <visibility>Visible</visibility>
-    </tabSettings>
-    <tabSettings>
-        <tab>Payment_Transaction__c</tab>
         <visibility>Visible</visibility>
     </tabSettings>
 </PermissionSet>
