@@ -75,6 +75,60 @@ public with sharing class StripeAPIClient {
     return wrapper;
   }
 
+  public static StripeCustomerWrapper updateCustomer(
+    String customerId,
+    StripeCustomerWrapper.CustomerRequest customer
+  ) {
+    HttpRequest req = new HttpRequest();
+    req.setEndpoint('callout:Stripe_NC/customers/' + customerId);
+    req.setHeader('Content-Type', 'application/x-www-form-urlencoded');
+    req.setMethod('POST');
+    req.setBody(toUrlEncodedString(customer));
+
+    // Log the HTTP callout details
+    Logger.debug(
+      'HTTP Callout to Stripe API: ' +
+        req.getEndpoint() +
+        ' HTTP Callout Method: ' +
+        req.getMethod() +
+        ' HTTP Callout Body: ' +
+        req.getBody()
+    );
+
+    Http http = new Http();
+    HttpResponse response = http.send(req);
+
+    if (response.getStatusCode() < 200 || response.getStatusCode() > 299) {
+      Logger.error(
+        'Error with HTTP Callout: ' +
+          response.getStatusCode() +
+          ' - ' +
+          response.getStatus() +
+          response.getBody()
+      );
+      Logger.saveLog();
+      throw new CalloutException(
+        'Error with HTTP Callout: ' +
+          response.getStatusCode() +
+          ' - ' +
+          response.getStatus() +
+          response.getBody()
+      );
+    }
+    Logger.debug(
+      'HTTP Callout successful: ' +
+        response.getStatusCode() +
+        ' HTTP Callout response: ' +
+        response.getBody()
+    );
+    Logger.saveLog();
+
+    StripeCustomerWrapper wrapper = StripeCustomerWrapper.parse(
+      response.getBody()
+    );
+    return wrapper;
+  }
+
   public static String createProduct(String productName) {
     HttpRequest req = new HttpRequest();
     req.setEndpoint('callout:Stripe_NC/products');

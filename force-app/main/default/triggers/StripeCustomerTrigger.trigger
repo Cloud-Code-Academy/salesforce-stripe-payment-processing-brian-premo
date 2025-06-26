@@ -7,4 +7,7 @@ trigger StripeCustomerTrigger on Stripe_Customer__c(
       StripeCustomerTriggerHandler.afterInsert(Trigger.new);
     }
   }
+  if (Trigger.isUpdate) {
+    StripeCustomerTriggerHandler.afterUpdate(Trigger.new, Trigger.oldMap);
+  }
 }
