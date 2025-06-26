@@ -1,15 +1,14 @@
 /**
  * -----------------------------------------------------------------------------
- * DESCRIPTION : Queueable class to perform asynchronous processing of Customer creation
+ * DESCRIPTION : Queueable class to perform asynchronous processing of Customer Updates
  *
  * AUTHOR      : Brian Premo
- * CREATED     : 2025-06-05
+ * CREATED     : 2025-06-25
  *
  * VERSION     : 1.0.0
  *
  * CHANGE LOG  :
- *  - 2025-06-05 v1.0.0 Initial creation
- *  - 2025-06-12 v1.0.1 minor change to populate custom name field
+ *  - 2025-06-25 v1.0.0 Initial creation
  * -----------------------------------------------------------------------------
  */
 public with sharing class UpdateStripeCustomerQueuable implements Queueable, Database.AllowsCallouts {

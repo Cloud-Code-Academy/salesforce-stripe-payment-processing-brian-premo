@@ -11,6 +11,7 @@
  * CHANGE LOG  :
  *  - 2025-06-12 v1.0.0 Initial creation
  *  - 2025-06-22 v1.0.1 Added tests for product and price creation
+ *  - 2025-06-25 v1.0.2 Added test for updating customer
  * -----------------------------------------------------------------------------
  */
 @IsTest
@@ -46,6 +47,10 @@ public with sharing class StripeAPIClientTest {
     );
   }
 
+  /* description: Test for successful update of a Stripe customer.
+   * This test verifies that the customer update API call returns a successful response
+   * with the expected updated customer information in the response body.
+   */
   @IsTest
   static void updateCustomerSuccess() {
     // Create test data
@@ -78,6 +83,10 @@ public with sharing class StripeAPIClientTest {
     );
   }
 
+  /* description: Test for failure in updating a Stripe customer due to invalid data.
+   * This test verifies that the customer update API call returns an error response
+   * when an invalid email is provided, such as an improperly formatted email address.
+   */
   @isTest
   static void updateCustomerFailure() {
     Boolean exceptionThrown = false;

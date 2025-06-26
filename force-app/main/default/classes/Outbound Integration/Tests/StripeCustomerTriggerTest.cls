@@ -10,6 +10,7 @@
  *
  * CHANGE LOG  :
  *  - 2025-06-12 v1.0.0 Initial creation
+ *  - 2025-06-25 v1.0.1 Added test for customer update
  * -----------------------------------------------------------------------------
  */
 @isTest
