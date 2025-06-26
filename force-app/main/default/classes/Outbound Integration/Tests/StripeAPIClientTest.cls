@@ -46,6 +46,74 @@ public with sharing class StripeAPIClientTest {
     );
   }
 
+  @IsTest
+  static void updateCustomerSuccess() {
+    // Create test data
+    Stripe_Customer__c customer = StripeTestDataFactory.createStripeCustomer();
+    TriggerBypass.bypassStripeCustomer = true;
+    insert customer;
+    TriggerBypass.bypassStripeCustomer = false;
+
+    StripeCustomerWrapper.CustomerRequest updateCustomerWrapper = new StripeCustomerWrapper.CustomerRequest();
+    updateCustomerWrapper.name = 'Test Customer Update';
+    updateCustomerWrapper.email = customer.Email__c;
+    updateCustomerWrapper.phone = customer.Phone__c;
+
+    StripeMockHttpResponse mockResponse = StripeMockHttpResponse.createSuccessCustomerUpdateResponse();
+    Test.setMock(HttpCalloutMock.class, mockResponse);
+    Test.startTest();
+    StripeAPIClient.updateCustomer(
+      customer.Stripe_Customer_ID__c,
+      updateCustomerWrapper
+    );
+    Test.stopTest();
+
+    //Assertions to verify response
+    Assert.areEqual(mockResponse.statusCode, 200, 'Status code should be 200');
+    Assert.areEqual(mockResponse.status, 'OK', 'Response status should be OK');
+    Assert.isNotNull(mockResponse.body, 'Response body should not be null');
+    Assert.isTrue(
+      mockResponse.body.contains('Test Customer Update'),
+      'Response body should contain the customer Name'
+    );
+  }
+
+  @isTest
+  static void updateCustomerFailure() {
+    Boolean exceptionThrown = false;
+    // Create test data
+    Stripe_Customer__c customer = StripeTestDataFactory.createStripeCustomer();
+    TriggerBypass.bypassStripeCustomer = true;
+    insert customer;
+    TriggerBypass.bypassStripeCustomer = false;
+    StripeCustomerWrapper.CustomerRequest updateCustomerWrapper = new StripeCustomerWrapper.CustomerRequest();
+    updateCustomerWrapper.name = 'Test Customer Update';
+    updateCustomerWrapper.email = 'invalidemail'; // Invalid email to simulate failure
+    updateCustomerWrapper.phone = customer.Phone__c;
+    // Set mock response
+    StripeMockHttpResponse mockResponse = StripeMockHttpResponse.createErrorCustomerResponse();
+    Test.setMock(HttpCalloutMock.class, mockResponse);
+    try {
+      Test.startTest();
+      // Call the method to test
+      StripeAPIClient.updateCustomer(
+        customer.Stripe_Customer_ID__c,
+        updateCustomerWrapper
+      );
+      Test.stopTest();
+    } catch (Exception e) {
+      exceptionThrown = true;
+      System.assert(
+        e.getMessage().contains('Error'),
+        'Exception message should indicate HTTP callout error'
+      );
+    }
+    System.assert(
+      exceptionThrown,
+      'Exception should have been thrown for HTTP 400 error'
+    );
+  }
+
   /* description: Test for failure in creating a Stripe customer due to invalid data.
    */
   @isTest

@@ -45,14 +45,14 @@ public with sharing class StripeCustomerTriggerHandler {
       if (
         TriggerBypass.bypassStripeCustomer == false &&
         customer.Stripe_Customer_ID__c != null &&
-        customer.Phone__c != oldMap.get(customer.Id).Phone__c &&
-        customer.Email__c != oldMap.get(customer.Id).Email__c &&
-        customer.Name__c != oldMap.get(customer.Id).Name__c &&
+        (customer.Phone__c != oldMap.get(customer.Id).Phone__c ||
+        customer.Email__c != oldMap.get(customer.Id).Email__c ||
+        customer.Name__c != oldMap.get(customer.Id).Name__c ||
         customer.Default_Payment_Method__c !=
-        oldMap.get(customer.Id).Default_Payment_Method__c
+        oldMap.get(customer.Id).Default_Payment_Method__c)
       ) {
         try {
-          // Create a Stripe customer using the Stripe API client
+          // Update a Stripe customer using the Stripe API client
           System.enqueueJob(new UpdateStripeCustomerQueuable(customer.Id));
         } catch (Exception e) {
           Logger.error('Error updating Stripe customer: ' + e.getMessage());
