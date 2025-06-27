@@ -9,6 +9,7 @@
  *
  * CHANGE LOG  :
  *  - 2025-06-25 v1.0.0 Initial creation
+ *  - 2025-06-26 v1.0.1 Added error handling and logging
  * -----------------------------------------------------------------------------
  */
 public with sharing class UpdateStripeCustomerQueuable implements Queueable, Database.AllowsCallouts {
@@ -20,12 +21,19 @@ public with sharing class UpdateStripeCustomerQueuable implements Queueable, Dat
 
   public void execute(QueueableContext context) {
     // Retrieve the Stripe_Customer__c record
-    Stripe_Customer__c customer = [
-      SELECT Id, Name, Email__c, Phone__c, Name__c, Stripe_Customer_ID__c
-      FROM Stripe_Customer__c
-      WHERE Id = :stripeCustomerId
-      LIMIT 1
-    ];
+    Stripe_Customer__c customer = null;
+    try {
+      customer = [
+        SELECT Id, Name, Email__c, Phone__c, Name__c, Stripe_Customer_ID__c
+        FROM Stripe_Customer__c
+        WHERE Id = :stripeCustomerId
+        LIMIT 1
+      ];
+    } catch (QueryException e) {
+      Logger.error('Error retrieving Stripe customer: ' + e.getMessage());
+      Logger.saveLog();
+      return; // Exit if the customer cannot be found
+    }
 
     try {
       // Create a Stripe customer using the Stripe API client
