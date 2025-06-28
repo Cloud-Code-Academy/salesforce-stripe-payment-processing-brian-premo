@@ -44,6 +44,11 @@ public class StripeMockHttpResponse implements HttpCalloutMock {
     return new StripeMockHttpResponse(200, 'OK', body);
   }
 
+  public static StripeMockHttpResponse createSuccessCustomerUpdateResponse() {
+    String body = '{"id":"cus_123456","object":"customer","address":null,"balance":0,"created":1749500297,"currency":null,"default_source":null,"delinquent":false,"description":null,"discount":null,"email":"test@example.com","invoice_prefix":"MVNZQEQO","invoice_settings":{"custom_fields":null,"default_payment_method":null,"footer":null,"rendering_options":null},"livemode":false,"metadata":{},"name":"Test Customer Update","next_invoice_sequence":1,"phone":"1234567890","preferred_locales":[],"shipping":null,"tax_exempt":"none","test_clock":null}';
+    return new StripeMockHttpResponse(200, 'OK', body);
+  }
+
   public static StripeMockHttpResponse createErrorCustomerResponse() {
     String body = '{"error":{"code":"invalid_email","doc_url":"https://stripe.com/docs/error-codes/invalid-email","message":"The email address provided is invalid.","param":"email","type":"invalid_request_error"}';
 

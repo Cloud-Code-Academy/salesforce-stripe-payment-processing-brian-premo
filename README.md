@@ -1,8 +1,6 @@
 # Salesforce Stripe Payment Processing
 
-This repository provides a robust Salesforce (Apex) integration with Stripe(https://stripe.com/) for payment processing. It supports both inbound (webhook) and outbound (API callout) Stripe events, enabling seamless synchronization of customers, subscriptions, and payments between Salesforce and Stripe.
-
----
+## This repository provides a robust Salesforce (Apex) integration with Stripe(https://stripe.com/) for payment processing. It supports both inbound (webhook) and outbound (API callout) Stripe events, enabling seamless synchronization of customers, subscriptions, and payments between Salesforce and Stripe. For data flow diagrams view here (https://miro.com/app/board/uXjVLRyp2JE=/)
 
 ## Features
 

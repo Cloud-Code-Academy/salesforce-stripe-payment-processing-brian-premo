@@ -11,6 +11,7 @@
  * CHANGE LOG  :
  *  - 2025-06-12 v1.0.0 Initial creation
  *  - 2025-06-22 v1.0.1 Added tests for product and price creation
+ *  - 2025-06-25 v1.0.2 Added test for updating customer
  * -----------------------------------------------------------------------------
  */
 @IsTest
@@ -43,6 +44,82 @@ public with sharing class StripeAPIClientTest {
     Assert.isTrue(
       mockResponse.body.contains('cus_123456'),
       'Response body should contain the customer ID'
+    );
+  }
+
+  /* description: Test for successful update of a Stripe customer.
+   * This test verifies that the customer update API call returns a successful response
+   * with the expected updated customer information in the response body.
+   */
+  @IsTest
+  static void updateCustomerSuccess() {
+    // Create test data
+    Stripe_Customer__c customer = StripeTestDataFactory.createStripeCustomer();
+    TriggerBypass.bypassStripeCustomer = true;
+    insert customer;
+    TriggerBypass.bypassStripeCustomer = false;
+
+    StripeCustomerWrapper.CustomerRequest updateCustomerWrapper = new StripeCustomerWrapper.CustomerRequest();
+    updateCustomerWrapper.name = 'Test Customer Update';
+    updateCustomerWrapper.email = customer.Email__c;
+    updateCustomerWrapper.phone = customer.Phone__c;
+
+    StripeMockHttpResponse mockResponse = StripeMockHttpResponse.createSuccessCustomerUpdateResponse();
+    Test.setMock(HttpCalloutMock.class, mockResponse);
+    Test.startTest();
+    StripeAPIClient.updateCustomer(
+      customer.Stripe_Customer_ID__c,
+      updateCustomerWrapper
+    );
+    Test.stopTest();
+
+    //Assertions to verify response
+    Assert.areEqual(mockResponse.statusCode, 200, 'Status code should be 200');
+    Assert.areEqual(mockResponse.status, 'OK', 'Response status should be OK');
+    Assert.isNotNull(mockResponse.body, 'Response body should not be null');
+    Assert.isTrue(
+      mockResponse.body.contains('Test Customer Update'),
+      'Response body should contain the customer Name'
+    );
+  }
+
+  /* description: Test for failure in updating a Stripe customer due to invalid data.
+   * This test verifies that the customer update API call returns an error response
+   * when an invalid email is provided, such as an improperly formatted email address.
+   */
+  @isTest
+  static void updateCustomerFailure() {
+    Boolean exceptionThrown = false;
+    // Create test data
+    Stripe_Customer__c customer = StripeTestDataFactory.createStripeCustomer();
+    TriggerBypass.bypassStripeCustomer = true;
+    insert customer;
+    TriggerBypass.bypassStripeCustomer = false;
+    StripeCustomerWrapper.CustomerRequest updateCustomerWrapper = new StripeCustomerWrapper.CustomerRequest();
+    updateCustomerWrapper.name = 'Test Customer Update';
+    updateCustomerWrapper.email = 'invalidemail'; // Invalid email to simulate failure
+    updateCustomerWrapper.phone = customer.Phone__c;
+    // Set mock response
+    StripeMockHttpResponse mockResponse = StripeMockHttpResponse.createErrorCustomerResponse();
+    Test.setMock(HttpCalloutMock.class, mockResponse);
+    try {
+      Test.startTest();
+      // Call the method to test
+      StripeAPIClient.updateCustomer(
+        customer.Stripe_Customer_ID__c,
+        updateCustomerWrapper
+      );
+      Test.stopTest();
+    } catch (Exception e) {
+      exceptionThrown = true;
+      System.assert(
+        e.getMessage().contains('Error'),
+        'Exception message should indicate HTTP callout error'
+      );
+    }
+    System.assert(
+      exceptionThrown,
+      'Exception should have been thrown for HTTP 400 error'
     );
   }
 

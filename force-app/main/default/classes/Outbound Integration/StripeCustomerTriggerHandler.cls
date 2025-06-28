@@ -18,8 +18,6 @@ public with sharing class StripeCustomerTriggerHandler {
   @param newList: List<Stripe_Customer__c> - The list of newly inserted Stripe_Customer__c records.
   */
   public static void afterInsert(List<Stripe_Customer__c> newList) {
-    List<Stripe_Customer__c> customersToUpdate = new List<Stripe_Customer__c>();
-
     for (Stripe_Customer__c customer : newList) {
       if (TriggerBypass.bypassStripeCustomer == false) {
         try {
@@ -37,6 +35,30 @@ public with sharing class StripeCustomerTriggerHandler {
         }
       }
     }
-    update customersToUpdate;
+  }
+
+  public static void afterUpdate(
+    List<Stripe_Customer__c> newList,
+    Map<Id, Stripe_Customer__c> oldMap
+  ) {
+    for (Stripe_Customer__c customer : newList) {
+      if (
+        TriggerBypass.bypassStripeCustomer == false &&
+        customer.Stripe_Customer_ID__c != null &&
+        (customer.Phone__c != oldMap.get(customer.Id).Phone__c ||
+        customer.Email__c != oldMap.get(customer.Id).Email__c ||
+        customer.Name__c != oldMap.get(customer.Id).Name__c ||
+        customer.Default_Payment_Method__c !=
+        oldMap.get(customer.Id).Default_Payment_Method__c)
+      ) {
+        try {
+          // Update a Stripe customer using the Stripe API client
+          System.enqueueJob(new UpdateStripeCustomerQueuable(customer.Id));
+        } catch (Exception e) {
+          Logger.error('Error updating Stripe customer: ' + e.getMessage());
+          Logger.saveLog();
+        }
+      }
+    }
   }
 }
