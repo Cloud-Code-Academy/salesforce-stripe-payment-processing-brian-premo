@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<DashboardFolder xmlns="http://soap.sforce.com/2006/04/metadata">
+    <folderShares>
+        <accessLevel>Manage</accessLevel>
+        <sharedTo>brianpremo97@resourceful-goat-lnfj4c.com</sharedTo>
+        <sharedToType>User</sharedToType>
+    </folderShares>
+    <name>Public</name>
+</DashboardFolder>
