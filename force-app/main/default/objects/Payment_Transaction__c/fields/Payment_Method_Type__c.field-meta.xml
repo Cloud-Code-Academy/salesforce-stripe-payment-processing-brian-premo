@@ -1,41 +1,12 @@
-<?xml version="1.0" encoding="UTF-8" ?>
-<CustomField xmlns="https://soap.sforce.com/2006/04/metadata">
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
     <fullName>Payment_Method_Type__c</fullName>
     <externalId>false</externalId>
     <label>Payment Method Type</label>
+    <length>64</length>
     <required>false</required>
-    <trackHistory>true</trackHistory>
+    <trackHistory>false</trackHistory>
     <trackTrending>false</trackTrending>
-    <type>Picklist</type>
-    <valueSet>
-        <restricted>true</restricted>
-        <valueSetDefinition>
-            <sorted>false</sorted>
-            <value>
-                <fullName>card</fullName>
-                <default>false</default>
-                <label>Card</label>
-            </value>
-            <value>
-                <fullName>bank_account</fullName>
-                <default>false</default>
-                <label>Bank Account</label>
-            </value>
-            <value>
-                <fullName>ach_debit</fullName>
-                <default>false</default>
-                <label>ACH Debit</label>
-            </value>
-            <value>
-                <fullName>wire_transfer</fullName>
-                <default>false</default>
-                <label>Wire Transfer</label>
-            </value>
-            <value>
-                <fullName>other</fullName>
-                <default>false</default>
-                <label>Other</label>
-            </value>
-        </valueSetDefinition>
-    </valueSet>
+    <type>Text</type>
+    <unique>false</unique>
 </CustomField>
